@@ -31,7 +31,8 @@ apikey='24S5R8E6GGJJRMT0'
 #28-0000052cec2c/w1_slave  28-0000052e21ac/w1_slave
 inside_temp = base_dir + '28-0000052cec2c'  + '/w1_slave'
 outside_temp = base_dir + '28-0000052e21ac'  + '/w1_slave'
-DEBUG_MODE = 0;
+DEBUG_MODE = 2;
+nprobes = 0;
 
 def program_reload():
 	global serial_port;
@@ -122,47 +123,48 @@ def update_thingspeak(apikey, fields):
 
 
 def serial_read_values(s_port):
-    """
+	"""
         read temperature from serial
-    """
-    global nprobes;
-    tempbuf = "";
-
- 
-    while True:
-        try:
-            ch = s_port.read(1)
-        except Exception, msg:
-            logit("read error! %s" %(msg));
-            break;
-        if ch == '\r':
-            pass
-        elif ch == '\n':
-            break;
-            tempbuf = "";
-        else:
-            tempbuf += ch
-    #global nprobes
-    if len(tempbuf) <= 0:
-        return;
-    if nprobes > 0 and tempbuf[0] != "#":
-        temps = tempbuf.split("\t");
-        if len(temps) == 1:
-            try:
-                light = float(temps[0]);
-            except Exception as msg:
-                logit("conversion failure \"%s\"" %(msg))
-            else:
-                #print "%10.d) temperatura %4.4f %4.4f %4.4f"%(nprobes, temp0, temp1, light)
-                print("%10.d) light level %d" %(nprobes, light));
-    		nprobes+=1
-		return (light)
-                
-    elif tempbuf[0] == "#":
-        debug_print("DEBUG: %s" %(tempbuf));
-    else:
-        debug_print("DEBUG (unknown output): %s" %(tempbuf));
-    nprobes+=1
+	"""
+	global nprobes;
+	tempbuf = "";
+	while True:
+		try:
+			ch = s_port.read(1)
+		except Exception, msg:
+			logit("read error! %s" %(msg));
+			break;
+		if ch == '\r':
+			pass
+		elif ch == '\n':
+			break;
+            		tempbuf = "";
+        	else:
+            		tempbuf += ch
+	#global nprobes
+	if len(tempbuf) <= 0:
+		logit("tempbuf lenght too short")
+		return (0,);
+	if nprobes > 0 and tempbuf[0] != "#":
+		temps = tempbuf.split("\t");
+		if len(temps) == 1:
+			try:
+				light = float(temps[0]);
+			except Exception as msg:
+				logit("conversion failure \"%s\"" %(msg))
+				nprobes+=1;
+			else:
+                		#print "%10.d) temperatura %4.4f %4.4f %4.4f"%(nprobes, temp0, temp1, light)
+                		logit("%10.d) light level %f" %(nprobes, light),prio=syslog.LOG_INFO);
+    			nprobes+=1
+		return (light,)
+	elif tempbuf[0] == "#":
+		debug_print("DEBUG: %s" %(tempbuf));
+	else:
+		debug_print("DEBUG (unknown output): %s" %(tempbuf));
+	nprobes+=1;
+	return ()
+    
 
 
 
@@ -196,10 +198,10 @@ def read_loop():
 	global apikey
 	tempin = read_temp(inside_temp)
 	tempout = read_temp(outside_temp)
-	light = 0.00;
 	if serial_port != False:
-		light = serial_read_values(serial_port)[1];
-		update_thingspeak(apikey, dict(field5=light, field3=tempin, field1=tempout));
+		values = serial_read_values(serial_port);
+		if len(values) >=  1:
+			update_thingspeak(apikey, dict(field5=values[0], field3=tempin, field1=tempout));
 	else:
 		update_thingspeak(apikey, dict(field3=tempin, field1=tempout));
 	logit("inside %f, outside %f" %(tempin, tempout), prio=syslog.LOG_INFO)
