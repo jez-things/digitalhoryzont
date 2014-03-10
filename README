@@ -16,4 +16,6 @@ Brak poprawnej ogslugi pidfile, jak narazie zostal objety rozwiazaniem
 tymczasowym w skrypcie startowym *ugly hack*
 
 
+NOTES:
+1) Nie przetestowano pobierania danych z serial dla arduino.
 
