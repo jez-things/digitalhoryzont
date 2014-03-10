@@ -38,19 +38,24 @@ def program_cleanup():
 def initial_program_setup():
 	global pidfile;
 	if os.path.isfile(pidfile):
+		#pass
 		logit( "%s already exists, exiting" % pidfile)
 		sys.exit();
 	else:
 		try:
-			#pidf = open(pidfile, 'w+')
+			pidf = open(pidfile, 'a+')
+			mypid = os.getpid();
+			pidf.write(str(mypid));
+			pidf.flush();
 
-			file(pidfile, 'w+').write(os.getpid());
+			pidf.close();
 		except Exception as e:
-			logit("pidfile creation exception %s" %(e));
+			logit("Pidfile creation exception: \"%s\"" %(e));
 
 def debug_print(msg):
-	if DEBUG_MODE > 0:
+	if DEBUG_MODE >= 1:
 		print("DEBUG %s:" %(msg));
+	if DEBUG_MODE >= 2:
 		syslog.syslog(syslog.LOG_DEBUG, "DEBUG %s:" %(msg));
 
 def logit(msg, prio=syslog.LOG_ERR):
@@ -197,7 +202,7 @@ def do_main_program():
 #
 context = daemon.DaemonContext(
 	working_directory='/var/www',
-	pidfile=lockfile.FileLock('/var/run/readtemp.pid'),
+#	pidfile=lockfile.FileLock('/var/run/readtemp.pid'),
 	)
 
 context.signal_map = {
