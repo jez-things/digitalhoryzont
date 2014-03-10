@@ -42,6 +42,8 @@ def initial_program_setup():
 		sys.exit();
 	else:
 		try:
+			#pidf = open(pidfile, 'w+')
+
 			file(pidfile, 'w+').write(os.getpid());
 		except Exception as e:
 			logit("pidfile creation exception %s" %(e));
@@ -167,6 +169,8 @@ def read_loop():
 
 
 def do_main_program():
+
+	initial_program_setup()
 	global serial_port;
 
     	try:
@@ -200,7 +204,6 @@ context.signal_map = {
 	signal.SIGTERM: program_cleanup,
 	signal.SIGHUP: 'terminate',
 	}
-
 
 if __name__ == "__main__":
 	from readtemp import (
