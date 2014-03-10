@@ -30,8 +30,7 @@ set -e
 case "$1" in
 	start)
 		echo -n "Starting $DESC: "
-		/root/readtemp.py
-		# Check if the ULIMIT is set in /etc/default/nginx
+		# Check if the ULIMIT is set in /etc/default/readtemp
 		if [ -n "$ULIMIT" ]; then
 			# Set the ulimits
 			ulimit $ULIMIT
@@ -45,6 +44,9 @@ case "$1" in
 		echo -n "Stopping $DESC: "
 		start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
 		    --exec $DAEMON || true
+
+
+		rm -vf /var/run/$NAME.pid
 		echo "$NAME."
 		;;
 
