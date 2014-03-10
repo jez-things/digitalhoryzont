@@ -33,8 +33,40 @@ inside_temp = base_dir + '28-0000052cec2c'  + '/w1_slave'
 outside_temp = base_dir + '28-0000052e21ac'  + '/w1_slave'
 DEBUG_MODE = 0;
 
+def program_reload():
+	global serial_port;
+	if not os.path.isfile(pidfile):
+		try:
+			pidf = open(pidfile, 'a+')
+			mypid = os.getpid();
+			pidf.write(str(mypid));
+			pidf.flush();
+
+			pidf.close();
+		except Exception as e:
+			logit("Pidfile re-creation exception: \"%s\"" %(e));
+
+	logit("Reloading serial port", prio=syslog.LOG_INFO);
+	if serial_port == False:
+		serial_port = serial.Serial();
+
+		serial_port.flushOutput()
+		serial_port.port = "/dev/ttyACM0";
+		serial_port.baudrate = 57600;
+		serial_port.timeout=0;
+		try:
+			serial_port.open()
+		except Exception as msg:
+			logit("Cannot reopen serial port");
+
+	return 0;
+
 def program_cleanup():
-	pass;
+	global pidfile;
+	logit("End of work", prio=syslog.LOG_INFO);
+	os.unlink(pidfile);
+	return 0;
+
 def initial_program_setup():
 	global pidfile;
 	if os.path.isfile(pidfile):
@@ -51,6 +83,7 @@ def initial_program_setup():
 			pidf.close();
 		except Exception as e:
 			logit("Pidfile creation exception: \"%s\"" %(e));
+			sys.exit(3);
 
 def debug_print(msg):
 	if DEBUG_MODE >= 1:
@@ -207,7 +240,7 @@ context = daemon.DaemonContext(
 
 context.signal_map = {
 	signal.SIGTERM: program_cleanup,
-	signal.SIGHUP: 'terminate',
+	signal.SIGHUP:  program_reload,
 	}
 
 if __name__ == "__main__":
@@ -215,6 +248,7 @@ if __name__ == "__main__":
 		initial_program_setup,
 		do_main_program,
 		program_cleanup,
+		program_reload,
 	)
 	with context:
 		do_main_program()
