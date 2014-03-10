@@ -1,13 +1,18 @@
-
-n Mar 10 14:37:51 CET 2014
-
+.--------------------------------------.
+| Mon Mar 10 14:37:51 CET 2014         |
+`--------------------------------------'
 * Dodano daemon mode
 * Dodano wsparcie dla syslog
 * Mozliwosc podlaczenia arduino do raspberry pi
 * Skrypt startujacy usluge
 
+.--------------------------------------.
+| Mon Mar 10 17:36:10 CET 2014         |
+`--------------------------------------'
+* Czyszczenie kodu
+
 TODO:
-Brak ogslugi pidfile, jak narazie zostal objety rozwiazaniem
+Brak poprawnej ogslugi pidfile, jak narazie zostal objety rozwiazaniem
 tymczasowym w skrypcie startowym *ugly hack*
 
 
