@@ -38,10 +38,13 @@ def program_cleanup():
 def initial_program_setup():
 	global pidfile;
 	if os.path.isfile(pidfile):
-		print "%s already exists, exiting" % pidfile
+		logit( "%s already exists, exiting" % pidfile)
 		sys.exit();
 	else:
-		file(pidfile, 'w').write(os.getpid());
+		try:
+			file(pidfile, 'w+').write(os.getpid());
+		except Exception as e:
+			logit("pidfile creation exception %s" %(e));
 
 def debug_print(msg):
 	if DEBUG_MODE > 0:
