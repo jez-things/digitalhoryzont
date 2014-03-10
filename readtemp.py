@@ -51,26 +51,6 @@ def debug_print(msg):
 def logit(msg, prio=syslog.LOG_ERR):
 	syslog.syslog(prio, msg);
 	     
-#def update_thingspeak(temp0=0.0, fieldno=1):
-#        """"
-#            This routine sends cur_temp which is a current temperature
-#            read from serial to thingspeak
-#        """
-#        conn = httplib.HTTPConnection("api.thingspeak.com")
-#
-#        apikey="24S5R8E6GGJJRMT0"
-#        query = '/update?key=%s&field%d=%2.2f' %(apikey, fieldno, temp0)
-#        try:
-#            conn.request("GET", query)
-#        except httplib.HTTPException as httpexpt:
-#            syslog.syslog(LOG_WARNING, "HTTP connection problem %s" % (httpexpt));
-#        except:
-#            syslog.syslog(LOG_ERR, "unknown exception");
-#            syslog.syslog(LOG_DEBUG, traceback.print_exc());
-#            pass
-#        r1 = conn.getresponse()
-#        syslog.syslog(LOG_INFO,  "          \t`->%s, %s" %(r1.status, r1.reason);
-#        conn.close()
 
 
 def update_thingspeak(apikey, fields):
@@ -92,7 +72,7 @@ def update_thingspeak(apikey, fields):
             debug_print(traceback.print_exc());
             pass
         r1 = conn.getresponse()
-        debug_print("          \t`->%s, %s" %(r1.status, r1.reason));
+        logit("          \t`->%s, %s" %(r1.status, r1.reason), prio=syslog.LOG_INFO);
         conn.close()
 
     
@@ -173,14 +153,13 @@ def read_loop():
 	global apikey
 	tempin = read_temp(inside_temp)
 	tempout = read_temp(outside_temp)
+	light = 0.00;
 	if serial_port != False:
 		light = serial_read_values(serial_port)[1];
 		update_thingspeak(apikey, dict(field5=light, field3=tempin, field1=tempout));
-		
-
-	syslog.syslog(syslog.LOG_INFO, "inside %f, outside %f" %(tempin, tempout))
-	#update_thingspeak(apikey, dict(field5=light, field3=tempin, field1=tempout));
-	update_thingspeak(apikey, dict(field3=tempin, field1=tempout));
+	else:
+		update_thingspeak(apikey, dict(field3=tempin, field1=tempout));
+	logit("inside %f, outside %f" %(tempin, tempout), prio=syslog.LOG_INFO)
 
 
 
@@ -193,7 +172,7 @@ def do_main_program():
 		logit("Serial open exception: %s for %s" % (msg,serial_port.name));
 		serial_port = False;
 	else:
-		logit("-> Opened serial port %s" %(serial_port.name), prio=LOG_INFO);
+		logit("-> Opened serial port %s" %(serial_port.name), prio=syslog.LOG_INFO);
 
 	if serial_port != False:
 		serial_port.flushOutput()
@@ -202,7 +181,7 @@ def do_main_program():
 		read_loop()
 		time.sleep(1)
 	# endless
-	logit("program shutting down!", prio=LOG_INFO);
+	logit("program shutting down!", prio=syslog.LOG_INFO);
 	sys.exit(3);
 
 
@@ -229,6 +208,4 @@ if __name__ == "__main__":
 	with context:
 		do_main_program()
 		
-#if __name__ == "__main__":
-#	daemon_loop()
 
