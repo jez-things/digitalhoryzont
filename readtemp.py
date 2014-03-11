@@ -245,6 +245,9 @@ context.signal_map = {
 	signal.SIGHUP:  program_reload,
 	}
 
+# XXX #########################################
+# dodanie wsparcia dla getopt(3)
+################################################
 if __name__ == "__main__":
 	from readtemp import (
 		initial_program_setup,
