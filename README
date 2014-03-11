@@ -11,10 +11,10 @@
 `--------------------------------------'
 * Czyszczenie kodu
 
-TODO:
-Brak poprawnej ogslugi pidfile, jak narazie zostal objety rozwiazaniem
-tymczasowym w skrypcie startowym *ugly hack*
-
+.--------------------------------------.
+| Tue Mar 11 14:42:55 CET 2014         |
+`--------------------------------------'
+* Przekierowanie stdout i stderr na terminal (w celu debugowania)
 
 NOTES:
 1) Nie przetestowano pobierania danych z serial dla arduino.
