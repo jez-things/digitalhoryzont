@@ -1,4 +1,4 @@
 digitalhoryzont
 ===============
 
-update_thingspeak
+Internet of things, collecting data from arduino and raspberry Pi
