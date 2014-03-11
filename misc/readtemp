@@ -35,18 +35,23 @@ case "$1" in
 			# Set the ulimits
 			ulimit $ULIMIT
 		fi
-		start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
-		    --exec $DAEMON -- $DAEMON_OPTS || true
+		$DAEMON
+		#start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
+		#    --exec $DAEMON -- $DAEMON_OPTS || true
 		echo "$NAME."
 		;;
 
 	stop)
 		echo -n "Stopping $DESC: "
-		start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
-		    --exec $DAEMON || true
-
-
-		rm -vf /var/run/$NAME.pid
+		#start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
+		#    --exec $DAEMON || true
+		dpid=$(head -1 /var/run/$NAME.pid)
+		if ! kill -0 $dpid; then
+			echo 'Stale pidfile, removing'
+			rm -vf /var/run/$NAME.pid
+		else
+			kill $pid
+		fi
 		echo "$NAME."
 		;;
 
