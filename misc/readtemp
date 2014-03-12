@@ -26,6 +26,21 @@ set -e
 
 . /lib/lsb/init-functions
 
+is_running () {
+	if [ -f "/var/run/$NAME.pid" ]; then
+		dpid=$(head -1 /var/run/$NAME.pid)
+		if kill -0 -- ${dpid} > /dev/null 2>&1 ; then
+			return 0;
+		else
+			echo 'Stale pidfile, removing'
+			rm -f /var/run/$NAME.pid
+			return 1;
+		fi
+	else
+		return 1;
+	fi
+	return 1;
+}
 
 case "$1" in
 	start)
@@ -35,7 +50,11 @@ case "$1" in
 			# Set the ulimits
 			ulimit $ULIMIT
 		fi
-		$DAEMON
+		if ! is_running; then
+			$DAEMON $DAEMON_OPTS
+		else
+			echo "$DAEMON is already running!"
+		fi
 		#start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
 		#    --exec $DAEMON -- $DAEMON_OPTS || true
 		echo "$NAME."
@@ -45,28 +64,30 @@ case "$1" in
 		echo -n "Stopping $DESC: "
 		#start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
 		#    --exec $DAEMON || true
-		dpid=$(head -1 /var/run/$NAME.pid)
-		if ! kill -0 $dpid; then
-			echo 'Stale pidfile, removing'
-			rm -vf /var/run/$NAME.pid
+		if is_running; then
+			kill -s SIGTERM -- "$(head -1 /var/run/$NAME.pid)"
 		else
-			kill $pid
+			echo "$NAME is not running!"
 		fi
 		echo "$NAME."
 		;;
 
 	restart|force-reload)
 		echo -n "Restarting $DESC: "
-		start-stop-daemon --stop --quiet --pidfile \
-		    /var/run/$NAME.pid --exec $DAEMON || true
-		sleep 1
-		# Check if the ULIMIT is set in /etc/default/readtemp
-		if [ -n "$ULIMIT" ]; then
-			# Set the ulimits
-			ulimit $ULIMIT
+		if is_running; then
+			kill -s SIGTERM -- "$(head -1 /var/run/$NAME.pid)"
+			sleep 1;
 		fi
-		start-stop-daemon --start --quiet --pidfile \
-		    /var/run/$NAME.pid --exec $DAEMON -- $DAEMON_OPTS || true
+		$DAEMON $DAEMON_OPTS
+		#start-stop-daemon --stop --quiet --pidfile \
+		#    /var/run/$NAME.pid --exec $DAEMON || true
+		# Check if the ULIMIT is set in /etc/default/readtemp
+		#if [ -n "$ULIMIT" ]; then
+		#	# Set the ulimits
+		#	ulimit $ULIMIT
+		#fi
+		#start-stop-daemon --start --quiet --pidfile \
+		#    /var/run/$NAME.pid --exec $DAEMON -- $DAEMON_OPTS || true
 		echo "$NAME."
 		;;
 
@@ -74,7 +95,7 @@ case "$1" in
 		status_of_proc -p /var/run/$NAME.pid "$DAEMON" readtemp && exit 0 || exit $?
 		;;
 	*)
-		echo "Usage: $NAME {start|stop|restart|reload|force-reload|status|configtest}" >&2
+		echo "Usage: $NAME {start|stop|restart|force-reload|status}" >&2
 		exit 1
 		;;
 esac
