@@ -41,7 +41,7 @@ outside_temp = base_dir + '28-0000052e21ac'  + '/w1_slave'
 # DEBUG_MODE = 3
 # * Informacje w postaci raw
 
-APIKEY='24S5R8E6GGJJRMT0'
+APIKEY=''
 DEBUG_MODE = 2;
 NPROBES = 0;
 
@@ -295,6 +295,8 @@ context.signal_map = {
 # XXX #########################################
 # Add support for getopt(3)
 ################################################
+
+APIKEY=os.getenv('APIKEY');
 if __name__ == "__main__":
 	from readtemp import (
 		initial_program_setup,
