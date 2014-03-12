@@ -51,7 +51,7 @@ def program_reload():
 		try:
 			pidf = open(pidfile, 'a+')
 			mypid = os.getpid();
-			pidf.write(str(mypid));
+			pidf.write(str(mypid)+"\n");
 			pidf.flush();
 
 			pidf.close();
