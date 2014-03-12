@@ -26,13 +26,24 @@ serial_port = serial.Serial();
 serial_port.port = "/dev/ttyACM0";
 serial_port.baudrate = 57600;
 serial_port.timeout=0;
-apikey='24S5R8E6GGJJRMT0'
 #device_folder = glob.glob(base_dir + '28*')[0]
 #28-0000052cec2c/w1_slave  28-0000052e21ac/w1_slave
+# XXX 
 inside_temp = base_dir + '28-0000052cec2c'  + '/w1_slave'
 outside_temp = base_dir + '28-0000052e21ac'  + '/w1_slave'
+
+# DEBUG_MODE = 0
+# * Brak debug mode
+# DEBUG_MODE = 1
+# * Podstawowe informacje
+# DEBUG_MODE = 2
+# * 
+# DEBUG_MODE = 3
+# * Informacje w postaci raw
+
+APIKEY='24S5R8E6GGJJRMT0'
 DEBUG_MODE = 2;
-nprobes = 0;
+NPROBES = 0;
 
 def program_reload():
 	global serial_port;
@@ -65,7 +76,11 @@ def program_reload():
 def program_cleanup():
 	global pidfile;
 	logit("End of work", prio=syslog.LOG_INFO);
-	os.unlink(pidfile);
+	debug_print("Unlinking pidfile=\"%s\"" % (pidfile));
+	try:
+		os.unlink(pidfile);
+	except Exception as msg:
+		debug_print("Problem with unlinking pidfile=\"%s\" : %s" %(pidfile, msg));
 	return 0;
 
 def initial_program_setup():
@@ -86,11 +101,14 @@ def initial_program_setup():
 			logit("Pidfile creation exception: \"%s\"" %(e));
 			sys.exit(3);
 
-def debug_print(msg):
-	if DEBUG_MODE >= 1:
+def debug_print(msg, mode=0):
+	if DEBUG_MODE >= 1 or mode >= 1:
 		print("DEBUG %s:" %(msg));
-	if DEBUG_MODE >= 2:
-		syslog.syslog(syslog.LOG_DEBUG, "DEBUG %s:" %(msg));
+	if DEBUG_MODE >= 2 or mode >= 2:
+		syslog.syslog(syslog.LOG_DEBUG, "%s" %(msg));
+	if DEBUG_MODE >= 3 or mode >= 3:
+		syslog.syslog(syslog.LOG_DEBUG, "%s" %(msg));
+	
 
 def logit(msg, prio=syslog.LOG_ERR):
 	syslog.syslog(prio, msg);
@@ -126,7 +144,7 @@ def serial_read_values(s_port):
 	"""
         read temperature from serial
 	"""
-	global nprobes;
+	global NPROBES;
 	tempbuf = "";
 	while True:
 		try:
@@ -141,28 +159,27 @@ def serial_read_values(s_port):
             		tempbuf = "";
         	else:
             		tempbuf += ch
-	#global nprobes
+	#global NPROBES
 	if len(tempbuf) <= 0:
 		logit("tempbuf lenght too short")
 		return (0,);
-	if nprobes > 0 and tempbuf[0] != "#":
+	if NPROBES > 0 and tempbuf[0] != "#":
 		temps = tempbuf.split("\t");
 		if len(temps) == 1:
 			try:
 				light = float(temps[0]);
 			except Exception as msg:
 				logit("conversion failure \"%s\"" %(msg))
-				nprobes+=1;
+				NPROBES+=1;
 			else:
-                		#print "%10.d) temperatura %4.4f %4.4f %4.4f"%(nprobes, temp0, temp1, light)
-                		logit("%10.d) light level %f" %(nprobes, light),prio=syslog.LOG_INFO);
-    			nprobes+=1
+                		logit("Light level %f" %(NPROBES, light),prio=syslog.LOG_INFO);
+    			NPROBES+=1
 		return (light,)
 	elif tempbuf[0] == "#":
 		debug_print("DEBUG: %s" %(tempbuf));
 	else:
 		debug_print("DEBUG (unknown output): %s" %(tempbuf));
-	nprobes+=1;
+	NPROBES+=1;
 	return ()
     
 
@@ -179,13 +196,19 @@ def read_temp_raw(device_file):
 def read_temp(device_file):
 	lines = read_temp_raw(device_file)
 	debug_print(lines[1]);
+	temp_c = False;
 	while lines[1].strip()[-3:] != 'YES':
 		time.sleep(0.2)
 		lines = read_temp_raw(device_file)
 		equals_pos = lines[1].find('t=')
 		if equals_pos != -1:
 			temp_string = lines[1][equals_pos+2:]
-			temp_c = float(temp_string) / 1000.0
+			try:
+				temp_c = float(temp_string) / 1000.0
+			except Exception:
+				logit("conversion failure!")
+
+
 			#temp_f = temp_c * 9.0 / 5.0 + 32.0
 			#update_thingspeak(temp_c, fieldno);
 			return temp_c
@@ -195,23 +218,47 @@ def read_temp(device_file):
 
 def read_loop():
 	global serial_port
-	global apikey
+	global APIKEY
+	thingsfld = {};
 	tempin = read_temp(inside_temp)
 	tempout = read_temp(outside_temp)
-	if serial_port != False:
-		values = serial_read_values(serial_port);
-		if len(values) >=  1:
-			update_thingspeak(apikey, dict(field5=values[0], field3=tempin, field1=tempout));
+	s_port_vals = False;
+
+	if tempin != False:
+		thingsfld.update({"field3":tempin});
 	else:
-		update_thingspeak(apikey, dict(field3=tempin, field1=tempout));
-	logit("inside %f, outside %f" %(tempin, tempout), prio=syslog.LOG_INFO)
+		logit("Read failure for internal temperature sensor!")
+	if tempout != False:
+		thingsfld.update({"field1":tempout});
+	else:
+		logit("Read failure for outside temperature sensor!")
+	if serial_port != False:
+		s_port_vals = serial_read_values(serial_port);
+		if len(s_port_vals) >=  1:
+			thingsfld.update({"field5":s_port_vals[0]});
+		else:
+			s_port_vals = False;
+			logit("Read failure from serial port!");
+	else:
+		debug_print("Serial port disabled! Not reading", mode=3);
+
+	if tempin != False or tempout != False or values !=
+			update_thingspeak(APIKEY, dict(field5=values[0], field3=tempin, field1=tempout));
+	elif tempin != False and tempout != False:
+		update_thingspeak(APIKEY, dict(field3=tempin, field1=tempout));
+	elif tempin != False and tempout == False:
+		update_thingspeak(APIKEY, dict(field3=tempin));
+	elif tempin == False and tempout != False:
+		update_thingspeak(APIKEY, dict(field3=tempin));
+		logit("inside %f, outside %f" %(tempin, tempout), prio=syslog.LOG_INFO)
+	elif tempin == False and tempout == False:
 
 
 
 def do_main_program():
-
 	initial_program_setup()
 	global serial_port;
+	global MAIN_LOOP;
 
     	try:
 		serial_port.open();
@@ -228,8 +275,8 @@ def do_main_program():
 		read_loop()
 		time.sleep(1)
 	# endless
-	logit("program shutting down!", prio=syslog.LOG_INFO);
-	sys.exit(3);
+	logit("Program shutting down!", prio=syslog.LOG_INFO);
+
 
 
 ###
@@ -246,7 +293,7 @@ context.signal_map = {
 	}
 
 # XXX #########################################
-# dodanie wsparcia dla getopt(3)
+# Add support for getopt(3)
 ################################################
 if __name__ == "__main__":
 	from readtemp import (
