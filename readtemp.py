@@ -102,11 +102,11 @@ def initial_program_setup():
 			sys.exit(3);
 
 def debug_print(msg, mode=0):
-	if DEBUG_MODE >= 1 or mode >= 1:
+	if DEBUG_MODE >= 1 and mode >= 1:
 		print("DEBUG %s:" %(msg));
-	if DEBUG_MODE >= 2 or mode >= 2:
+	if DEBUG_MODE >= 2 and mode >= 2:
 		syslog.syslog(syslog.LOG_DEBUG, "%s" %(msg));
-	if DEBUG_MODE >= 3 or mode >= 3:
+	if DEBUG_MODE >= 3 and  mode >= 3:
 		syslog.syslog(syslog.LOG_DEBUG, "%s" %(msg));
 	
 
@@ -134,7 +134,7 @@ def update_thingspeak(apikey, fields):
             debug_print(traceback.print_exc());
             pass
         r1 = conn.getresponse()
-        logit("          \t`->%s, %s" %(r1.status, r1.reason), prio=syslog.LOG_INFO);
+        logit("%s >%s, %s" %(querybuf, r1.status, r1.reason), prio=syslog.LOG_INFO);
         conn.close()
 
     
@@ -195,7 +195,7 @@ def read_temp_raw(device_file):
 # fieldno = Name of URL parameter "field". Limited to number.
 def read_temp(device_file):
 	lines = read_temp_raw(device_file)
-	debug_print(lines[1]);
+	debug_print(lines[1], mode=3);
 	temp_c = False;
 	while lines[1].strip()[-3:] != 'YES':
 		time.sleep(0.2)
@@ -207,10 +207,6 @@ def read_temp(device_file):
 				temp_c = float(temp_string) / 1000.0
 			except Exception:
 				logit("conversion failure!")
-
-
-			#temp_f = temp_c * 9.0 / 5.0 + 32.0
-			#update_thingspeak(temp_c, fieldno);
 			return temp_c
 		else:
 			return "failure"
