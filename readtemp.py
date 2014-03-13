@@ -242,16 +242,8 @@ def read_loop():
 	else:
 		debug_print("Serial port disabled! Not reading", mode=3);
 
-	if tempin != False or tempout != False or values !=
-			update_thingspeak(APIKEY, dict(field5=values[0], field3=tempin, field1=tempout));
-	elif tempin != False and tempout != False:
-		update_thingspeak(APIKEY, dict(field3=tempin, field1=tempout));
-	elif tempin != False and tempout == False:
-		update_thingspeak(APIKEY, dict(field3=tempin));
-	elif tempin == False and tempout != False:
-		update_thingspeak(APIKEY, dict(field3=tempin));
-		logit("inside %f, outside %f" %(tempin, tempout), prio=syslog.LOG_INFO)
-	elif tempin == False and tempout == False:
+	if tempin != False or tempout != False or s_port_vals != False:
+		update_thingspeak(APIKEY, thingsfld);
 
 
 
