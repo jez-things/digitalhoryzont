@@ -28,8 +28,8 @@ set -e
 
 is_running () {
 	if [ -f "/var/run/$NAME.pid" ]; then
-		dpid=$(head -1 /var/run/$NAME.pid)
-		if kill -0 -- ${dpid} > /dev/null 2>&1 ; then
+		dpid="$(head -1 /var/run/$NAME.pid)"
+		if /bin/kill -0 -- ${dpid} >/dev/null 2>&1; then
 			return 0;
 		else
 			echo 'Stale pidfile, removing'
@@ -53,7 +53,8 @@ case "$1" in
 		if ! is_running; then
 			$DAEMON $DAEMON_OPTS
 		else
-			echo "$DAEMON is already running!"
+			echo " already running!"
+			exit 3;
 		fi
 		#start-stop-daemon --start --quiet --pidfile /var/run/$NAME.pid \
 		#    --exec $DAEMON -- $DAEMON_OPTS || true
@@ -65,9 +66,10 @@ case "$1" in
 		#start-stop-daemon --stop --quiet --pidfile /var/run/$NAME.pid \
 		#    --exec $DAEMON || true
 		if is_running; then
-			kill -s SIGTERM -- "$(head -1 /var/run/$NAME.pid)"
+			/bin/kill -- "$(head -1 /var/run/$NAME.pid)"
 		else
-			echo "$NAME is not running!"
+			echo " not running!"
+			exit 3;
 		fi
 		echo "$NAME."
 		;;
@@ -75,9 +77,13 @@ case "$1" in
 	restart|force-reload)
 		echo -n "Restarting $DESC: "
 		if is_running; then
-			kill -s SIGTERM -- "$(head -1 /var/run/$NAME.pid)"
+			echo "stopping"
+			/bin/kill -- "$(head -1 /var/run/$NAME.pid)"
 			sleep 1;
+		else
+			echo "is not running!"
 		fi
+		echo "Starting..."
 		$DAEMON $DAEMON_OPTS
 		#start-stop-daemon --stop --quiet --pidfile \
 		#    /var/run/$NAME.pid --exec $DAEMON || true
