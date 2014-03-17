@@ -16,10 +16,12 @@ import httplib
 import string
 import daemon
 import lockfile
+import getopt
 
 os.system('modprobe w1-gpio')
 os.system('modprobe w1-therm')
-     
+
+dodaemon = True
 pidfile = '/var/run/readtemp.pid'
 base_dir = '/sys/bus/w1/devices/'
 serial_port = serial.Serial();
@@ -102,11 +104,11 @@ def initial_program_setup():
 			sys.exit(3);
 
 def debug_print(msg, mode=0):
-	if DEBUG_MODE >= 1 and mode >= 1:
+	if DEBUG_MODE >= 1 and mode <= 1:
 		print("DEBUG %s:" %(msg));
-	if DEBUG_MODE >= 2 and mode >= 2:
+	if DEBUG_MODE >= 2 and mode <= 2:
 		syslog.syslog(syslog.LOG_DEBUG, "%s" %(msg));
-	if DEBUG_MODE >= 3 and  mode >= 3:
+	if DEBUG_MODE >= 3 and  mode <= 3:
 		syslog.syslog(syslog.LOG_DEBUG, "%s" %(msg));
 	
 
@@ -186,15 +188,22 @@ def serial_read_values(s_port):
 
 
 def read_temp_raw(device_file):
-	f = open(device_file, 'r')
-	lines = f.readlines()
-	f.close()
+	try:
+		f = open(device_file, 'r')
+	except IOError as e:
+		logit("Couldn't read device file in path \"%s\":%s" % (device_file, e.strerror))
+		return None;
+	else:
+		lines = f.readlines()
+		f.close()
 	return lines
 
 # device_file = Path to device.
 # fieldno = Name of URL parameter "field". Limited to number.
 def read_temp(device_file):
 	lines = read_temp_raw(device_file)
+	if lines == None:
+		return None;
 	debug_print(lines[1], mode=3);
 	temp_c = False;
 	while lines[1].strip()[-3:] != 'YES':
@@ -220,11 +229,11 @@ def read_loop():
 	tempout = read_temp(outside_temp)
 	s_port_vals = False;
 
-	if tempin != False:
+	if tempin != None:
 		thingsfld.update({"field3":tempin});
 	else:
 		logit("Read failure for internal temperature sensor!")
-	if tempout != False:
+	if tempout != None:
 		thingsfld.update({"field1":tempout});
 	else:
 		logit("Read failure for outside temperature sensor!")
@@ -283,16 +292,44 @@ context.signal_map = {
 # XXX #########################################
 # Add support for getopt(3)
 ################################################
+def usage():
+	print "usage: readtemp.py -d [debug_level] "
+
 
 APIKEY=os.getenv('APIKEY');
 if __name__ == "__main__":
+	try:
+		opts, args = getopt.getopt(sys.argv[1:], 'fhd:S:vA:', ["foreground", "help", "debug=","serial_port=", "apikey="])
+	except getopt.GetoptError as err:
+		print str(err);
+		usage();
+		sys.exit(64);
+	for o, a in opts:
+		if o == "-v":
+			verbose = True;
+		elif o in ("-S", "--serial_port"):
+			serial_port = a;
+		elif o in ("-d", "--debug"):
+			DEBUG_MODE = int(a);
+		elif o in ("-A", "--apikey"):
+			APIKEY = a;
+		elif o in ("-h", "--help"):
+			usage();
+			sys.exit(64);
+		elif o == "-f":
+			dodaemon = False;
+		else:
+			assert False, "Unhandled option"
 	from readtemp import (
 		initial_program_setup,
 		do_main_program,
 		program_cleanup,
 		program_reload,
 	)
-	with context:
+	if dodaemon:
+		with context:
+			do_main_program()
+	else:
 		do_main_program()
 		
 
