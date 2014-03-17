@@ -22,7 +22,16 @@
 Mar 11 18:29:46 raszpla readtemp.py: conversion failure "invalid literal for float(): 331..00"
 Blad konwersji skutkuje wylaczenie sie daemona
 
+.--------------------------------------.
+| Mon Mar 17 10:13:10 CET 2014         |
+`--------------------------------------'
+Support for getopt(3)
+
 
 NOTES:
 1) Nie przetestowano pobierania danych z serial dla arduino.
+
+
+BUGS:
+reading 1byte from serial
 
