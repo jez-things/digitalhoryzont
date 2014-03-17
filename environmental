@@ -1,0 +1,128 @@
+#!/bin/sh
+#
+: <<=cut
+
+=head1 NAME
+
+environmental - Plugin to monitor DS18B20 thermometrs
+
+=head1 APPLICABLE SYSTEMS
+
+All Linux systems
+
+=head1 CONFIGURATION
+
+The following is default configuration
+
+  [environmental]
+	env.ds18b20_0_id	
+	env.ds18b20_0_label	
+	env.ds18b20_1_id	
+	env.ds18b20_1_label	
+	env.ds18b20_2_id	
+	env.ds18b20_2_label	
+
+
+=head2 EXAMPLE WARNING AND CRITICAL SETTINGS
+
+=head1 INTERPRETATION
+
+
+=head1 MAGIC MARKERS
+
+  #%# family=auto
+  #%# capabilities=autoconf
+
+
+=head1 VERSION
+
+  $Id$
+
+=head1 BUGS
+
+
+Otherwise none known
+
+=head1 AUTHOR
+
+Unknown
+
+=head1 LICENSE
+
+BSD
+
+=cut
+
+
+. $MUNIN_LIBDIR/plugins/plugin.sh
+
+if [ "$1" = "autoconf" ]; then
+	if [ -r /proc/stat ]; then
+		echo yes
+		exit 0
+	else
+		echo no
+		exit 0
+	fi
+fi
+n=0;
+for l in $(cat /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves);
+do
+	eval ds18b20_${n}_id=${l}
+	: $((n=n+1))
+	#echo  ds18b20_${n}_id=${l}
+done
+ds18b20_0_label=${ds18b20_0_label:-"${ds18b20_0_id:?}"}
+ds18b20_1_label=${ds18b20_1_label:-"${ds18b20_1_id:?}"}
+ds18b20_2_label=${ds18b20_2_label:-"${ds18b20_2_id:?}"}
+
+extinfo=""
+
+
+if [ "$1" = "config" ]; then
+
+	echo 'graph_title Temperature from DS18B20'
+	#echo "graph_order tempout  tempin" $extinfo
+	 echo "graph_args --base 1000 -r -l 0"
+	 echo 'graph_vlabel temperature '
+	 echo 'graph_scale no'
+	 echo 'graph_info This graph shows temperature from DS18B20 which is located on window'
+	 echo 'graph_category environmental'
+	 echo 'graph_period second'
+	echo 'ds18_0.draw AREA'
+	#echo 'ds18_0.min -40'
+	#echo 'ds18_0.max 120'
+	echo 'ds18_0.type GAUGE'
+	 echo "ds18_0.label ${ds18b20_0_label}"
+	 echo "ds18_0.info  ${ds18b20_0_label}" 
+
+	 echo "ds18_1.label ${ds18b20_1_label}"
+	 echo "ds18_1.info  ${ds18b20_1_label}"
+
+	#echo 'ds18_1.draw STACK'
+	#echo 'ds18_1.min -40'
+	echo 'ds18_1.type GAUGE'
+	 echo "ds18_2.label ${ds18b20_2_label}"
+	 echo "ds18_2.info  ${ds18b20_2_label}"
+	#echo 'ds18_2.draw STACK'
+	#echo 'ds18_1.min -40'
+	echo 'ds18_2.type GAUGE'
+
+	exit 0
+fi
+
+get_ds18b20_temp () 
+{
+	W1_THERM="/sys/bus/w1/devices/"
+	#DS18_OUT="/sys/bus/w1/devices/28-0000052e21ac/w1_slave"
+	#intemp=$(awk "/t=/{str=int(substr(\$10,3)) / 1000; print str;}" $ds18_in )
+
+	#outtemp=$(awk '/t=/{str=int(substr($10,3)) / 1000; print str;}' $ds18_out)
+	printf "ds18_0.value %f\n" "$(awk '/t=/{str=int(substr($10,3)) / 1000; print str;}' ${W1_THERM}/${ds18b20_0_id}/w1_slave )"
+
+	printf "ds18_1.value %f\n" "$(awk '/t=/{str=int(substr($10,3)) / 1000; print str;}' ${W1_THERM}/${ds18b20_1_id}/w1_slave )"
+	printf "ds18_2.value %f\n" "$(awk '/t=/{str=int(substr($10,3)) / 1000; print str;}' ${W1_THERM}/${ds18b20_2_id}/w1_slave )"
+}
+
+get_ds18b20_temp;
+
