@@ -65,16 +65,19 @@ if [ "$1" = "autoconf" ]; then
 		exit 0
 	fi
 fi
+
+ds18b20_count=${ds18b20_count:-3}
 n=0;
-for l in $(cat /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves);
+for l in $(grep '^28' /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves);
 do
+
 	eval ds18b20_${n}_id=${l}
+	eval ds18b20_${n}_label=\${ds18b20_${n}_label:-\$ds18b20_${n}_id}
 	: $((n=n+1))
-	#echo  ds18b20_${n}_id=${l}
 done
-ds18b20_0_label=${ds18b20_0_label:-"${ds18b20_0_id:?}"}
-ds18b20_1_label=${ds18b20_1_label:-"${ds18b20_1_id:?}"}
-ds18b20_2_label=${ds18b20_2_label:-"${ds18b20_2_id:?}"}
+#ds18b20_0_label=${ds18b20_0_label:-"${ds18b20_0_id:?}"}
+#ds18b20_1_label=${ds18b20_1_label:-"${ds18b20_1_id:?}"}
+#ds18b20_2_label=${ds18b20_2_label:-"${ds18b20_2_id:?}"}
 
 extinfo=""
 
