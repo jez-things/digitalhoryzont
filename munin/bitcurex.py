@@ -8,9 +8,8 @@ plugin_name=list(os.path.split(sys.argv[0]))[1]
 plugin_version="3.0"
 
 url = os.getenv("url", "")
-bitcurex_user = os.getenv("bitcurex_user", "")
 url='/data/ticker.json'
-bitcurex_user = 'jez'
+
 #'https://pln.bitcurex.com/data/ticker.json'
 def bitcurex_rpc():
     conn = httplib.HTTPSConnection("pln.bitcurex.com")
