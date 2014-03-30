@@ -66,15 +66,19 @@ if [ "$1" = "autoconf" ]; then
 	fi
 fi
 
-ds18b20_count=${ds18b20_count:-3}
-n=0;
+ds18b20_count=0;
 for l in $(grep '^28' /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves);
 do
 
-	eval ds18b20_${n}_id=${l}
-	eval ds18b20_${n}_label=\${ds18b20_${n}_label:-\$ds18b20_${n}_id}
-	: $((n=n+1))
+	eval ds18b20_${l#28-}_id=${l#28-}
+	eval ds18b20_${l#28-}_label=\${ds18b20_${l#28-}_label:-termo \${l}}
+	#eval ds18b20_\${l}_label=\"\${l}\"
+#\{ds18b20_${l}_label:-\$l\}
+	eval ds18b20_list=\"\${l} \$ds18b20_list\"
+	#eval ds18b20_${n}_devpath=$l"
+	: $((ds18b20_count=ds18b20_count+1))
 done
+echo "$ds18b20_list"
 #ds18b20_0_label=${ds18b20_0_label:-"${ds18b20_0_id:?}"}
 #ds18b20_1_label=${ds18b20_1_label:-"${ds18b20_1_id:?}"}
 #ds18b20_2_label=${ds18b20_2_label:-"${ds18b20_2_id:?}"}
@@ -92,26 +96,34 @@ if [ "$1" = "config" ]; then
 	 echo 'graph_info This graph shows temperature from DS18B20 which is located on window'
 	 echo 'graph_category environmental'
 	 echo 'graph_period second'
-	echo 'ds18_0.draw AREA'
-	#echo 'ds18_0.min -40'
-	#echo 'ds18_0.max 120'
-	echo 'ds18_0.type GAUGE'
-	 echo "ds18_0.label ${ds18b20_0_label}"
-	 echo "ds18_0.info  ${ds18b20_0_label}" 
 
-	 echo "ds18_1.label ${ds18b20_1_label}"
-	 echo "ds18_1.info  ${ds18b20_1_label}"
+	
+	for lm in $ds18b20_list;
+	do
+		lm=${lm#28-}
+		echo "${lm}.draw AREA"
+		echo "${lm}.min -40"
+		echo "${lm}.max 60"
+		echo "${lm}.type GAUGE"
+		eval lm_label=\${ds18b20_${lm}_label}
+	 	echo "$lm.label ${lm_label}"
+	 	echo "$lm.info  ${lm_label}" 
 
-	#echo 'ds18_1.draw STACK'
-	#echo 'ds18_1.min -40'
-	echo 'ds18_1.type GAUGE'
-	 echo "ds18_2.label ${ds18b20_2_label}"
-	 echo "ds18_2.info  ${ds18b20_2_label}"
-	#echo 'ds18_2.draw STACK'
-	#echo 'ds18_1.min -40'
-	echo 'ds18_2.type GAUGE'
+	done
 
 	exit 0
+elif [ "$1" = "test" ]; then
+	echo '========================================'
+	 #ls /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves
+	 cat /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves
+	echo '========================================'
+	echo "=> known devices:"
+	for l in ${ds18b20_list}
+	do
+		eval echo \${ds18b20_${l#28-}_label}
+	done
+	exit 0;
+
 fi
 
 get_ds18b20_temp () 
@@ -121,10 +133,13 @@ get_ds18b20_temp ()
 	#intemp=$(awk "/t=/{str=int(substr(\$10,3)) / 1000; print str;}" $ds18_in )
 
 	#outtemp=$(awk '/t=/{str=int(substr($10,3)) / 1000; print str;}' $ds18_out)
-	printf "ds18_0.value %f\n" "$(awk '/t=/{str=int(substr($10,3)) / 1000; print str;}' ${W1_THERM}/${ds18b20_0_id}/w1_slave )"
+	for l in ${ds18b20_list}
+	do
+	printf "%s.value %f\n" "${l#28-}" "$(awk '/t=/{str=int(substr($10,3)) / 1000; print str;}' ${W1_THERM}/${l}/w1_slave )"
 
-	printf "ds18_1.value %f\n" "$(awk '/t=/{str=int(substr($10,3)) / 1000; print str;}' ${W1_THERM}/${ds18b20_1_id}/w1_slave )"
-	printf "ds18_2.value %f\n" "$(awk '/t=/{str=int(substr($10,3)) / 1000; print str;}' ${W1_THERM}/${ds18b20_2_id}/w1_slave )"
+	#printf "ds18_1.value %f\n" "$(awk '/t=/{str=int(substr($10,3)) / 1000; print str;}' ${W1_THERM}/28-${ds18b20_1_id}/w1_slave )"
+	#printf "ds18_2.value %f\n" "$(awk '/t=/{str=int(substr($10,3)) / 1000; print str;}' ${W1_THERM}/${ds18b20_2_id}/w1_slave )"
+	done
 }
 
 get_ds18b20_temp;
