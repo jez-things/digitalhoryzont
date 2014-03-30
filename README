@@ -1,3 +1,7 @@
+it needs to run python2-serial, python2-daemon
+supported on python2.x tested only on python2.7
+
+
 .--------------------------------------.
 | Mon Mar 10 14:37:51 CET 2014         |
 `--------------------------------------'
