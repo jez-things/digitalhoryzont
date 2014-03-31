@@ -78,7 +78,7 @@ do
 	#eval ds18b20_${n}_devpath=$l"
 	: $((ds18b20_count=ds18b20_count+1))
 done
-echo "$ds18b20_list"
+#echo "$ds18b20_list"
 #ds18b20_0_label=${ds18b20_0_label:-"${ds18b20_0_id:?}"}
 #ds18b20_1_label=${ds18b20_1_label:-"${ds18b20_1_id:?}"}
 #ds18b20_2_label=${ds18b20_2_label:-"${ds18b20_2_id:?}"}
