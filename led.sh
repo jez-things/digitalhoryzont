@@ -79,12 +79,21 @@ do_stdtest () {
 		set_state error;
 	fi
 }
+
+do_init () {
+	echo 'initialization of leds' | logger -t check_state
+	init_led;
+}
+
 #########################################################################
 # main
 ######
 
 cmd=${1:-stdtest}
 case ${cmd} in
+	init)
+		do_init;
+		;;
 	stdtest)
 		do_stdtest;
 		;;
@@ -92,7 +101,7 @@ case ${cmd} in
 		set_state shutdown;
 		;;
 	*)
-		echo "usage: $0 [stdtest|shutdown]"
+		echo "usage: $0 [stdtest|shutdown|init]"
 		exit 64
 		;;
 esac
