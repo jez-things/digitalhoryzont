@@ -2,6 +2,7 @@
 # -*- coding:utf-8 -*-
 
 import os, sys, string, glob, socket, json
+import syslog
 import dhtreader
 
 plugin_name = list(os.path.split(sys.argv[0]))[1]
@@ -15,7 +16,14 @@ if arg == "config":
 	print("h.draw AREA");
 else:
 	dhtreader.init()
-	t, h = dhtreader.read(11, 25)
+	read_loop = True
+	while read_loop:
+		try:
+			t, h = dhtreader.read(11, 25)
+		except Exception as e:
+			syslog.syslog(syslog.LOG_ERR, "read exception: %s" %(e));
+		else:
+			read_loop = False
 	print("h.value {0}".format(h))
 	
 	
