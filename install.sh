@@ -9,7 +9,7 @@
 # value greater than 0.
 : ${INSTALLDIR:=""}
 : ${DEBUG_MODE:=0};
-: ${ENABLED_PLUGINS:='cgminer environmental'}
+: ${ENABLED_PLUGINS:='cgminer bitcurex.py polmine'}
 : ${REPOSITORY_URL:='https://github.com/jezjestem/digitalhoryzont.git'}
 : ${DH_DEPS:='munin-node python'}
 
@@ -24,9 +24,12 @@ munin_plugins () {
 	fi
 	for plugin in ${ENABLED_PLUGINS};
 	do
-		dprint "|==> installing $plugin"
+		echo "|==> installing $plugin"
 		dprint "install -b -v -m 755 -o root munin/$plugin /etc/munin/plugins/$plugin"
+		install -b -v -m 755 -o root munin/$plugin /etc/munin/plugins/$plugin
 	done
+#cat <<- END
+#END
 }
 
 install_dependencies () {
@@ -46,9 +49,13 @@ install_dependencies () {
 ###
 
 [ -z "${SKIP_DEPENDENCIES}" ] && install_dependencies;
-INSTALLDIR=$(mktemp -d '/tmp/digitalhoryzont.XXXXXXX')
+#INSTALLDIR=$(mktemp -d '/tmp/digitalhoryzont.XXXXXXX') XXX
 
 dprint "|> Installing digitalhoryzont"
+echo "|> Installing munin plugins"
+munin_plugins
+exit 0; # XXX ugly hack
+
 dprint "|=> Temporary directory \"$INSTALLDIR\""
 #cd $INSTALLDIR
 #git clone -q "${REPOSITORY_URL}"
