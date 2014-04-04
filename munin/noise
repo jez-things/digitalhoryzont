@@ -1,0 +1,99 @@
+#!/bin/sh
+#
+: <<=cut
+
+=head1 NAME
+
+environmental - Plugin to monitor noise level
+
+=head1 APPLICABLE SYSTEMS
+
+All Linux systems
+
+=head1 CONFIGURATION
+
+The following is default configuration
+
+  [noise]
+  user root
+
+
+=head2 EXAMPLE WARNING AND CRITICAL SETTINGS
+It is necessary to run this script as root
+
+=head1 INTERPRETATION
+
+
+=head1 MAGIC MARKERS
+
+  #%# family=auto
+  #%# capabilities=autoconf
+
+
+=head1 VERSION
+
+  $Id$
+
+=head1 BUGS
+
+
+Otherwise none known
+
+=head1 AUTHOR
+
+Unknown
+
+=head1 LICENSE
+
+BSD
+
+=cut
+
+
+. $MUNIN_LIBDIR/plugins/plugin.sh
+
+if [ "$1" = "autoconf" ]; then
+	if [ -r /proc/stat ]; then
+		echo yes
+		exit 0
+	else
+		echo no
+		exit 0
+	fi
+fi
+
+
+extinfo=""
+
+
+if [ "$1" = "config" ]; then
+
+	echo 'graph_title Noise'
+	#echo "graph_order tempout  tempin" $extinfo
+	 echo "graph_args --base 1000 -r -l 0"
+	 echo 'graph_vlabel noise '
+	 echo 'graph_scale yes'
+	 echo 'graph_info This graph shows noise level'
+	 echo 'graph_category environmental'
+	 echo 'graph_period second'
+	echo "n.draw AREA"
+		echo "n.min 0"
+		echo "n.type GAUGE"
+	 	echo "n.label noise"
+
+	
+	exit 0
+elif [ "$1" = "test" ]; then
+	exit 0;
+
+fi
+
+get_noise_level () 
+{
+
+	printf "l.value %d\n" "$(/usr/local/bin/microphone)"
+
+}
+
+get_noise_level;
+
