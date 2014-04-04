@@ -1,8 +1,10 @@
 
 
-Digital horyzon
+Digital Horyzon
+===============
 
 Abstract
+===============
 
 Internet of things: set of phyton scripts for collecting data from raspberryPi
 by external sensors (e.g. temperature, humidity, light) and bitcoin mining 
@@ -10,6 +12,7 @@ hardware, sending to munin on external box.
 
 
 Table of contents: 
+===============
   1. Introduction 
   
   1.1. Preface
@@ -36,6 +39,7 @@ Table of contents:
 ------------------------------------------------------------------------------
 
 1. Introduction
+===============
 ----
   1.1. Preface
    Internet of things: set of phyton scripts for collecting data from raspberry Pi by external sensors 
@@ -51,10 +55,31 @@ Table of contents:
    Each script has different dependencies. 
     readtemp.py - python2-serial python2-daemon
                   It's supported on python2.x tested at the moment only on python2.7
+
       
   2.3. Configuration
 
-  2.3.1. readtemp.py
+  2.3.1. munin/bitcurex.py
+	bitcurex.pl python script is a munin script used for drawing munin charts of BTC
+   currency from well-known polish bitcoin stock. No configuration provided at the moment.
+
+  2.3.2. munin/polmine
+	polmine - 
+
+  2.3.3. munin/cgminer
+	cgminer is a python script which draws munin charts of cgminer and tools which
+  support JSON API of cgminer or tools derived from cgminer e.g. bfgminer. There are
+  two configuration options available: rpc_port and rpc_host. There's no need to
+  configure these options in munin-node.conf in that case default values are:
+
+  rpc_port 4028
+  rpc_host 127.0.0.1
+
+  script itself supports (except standard ones) additional command line options: test
+  When cgminer is run with a test option it connects to given rpc_host on a given port
+  and prints all variables available.
+
+  2.3.4. readtemp.py
 	readtemp is a python script which runs on python 2.x version 3.x is not supported 
   at the moment. Application reads data in form variable=value <space> ...
   Then it sends all collected data to thingspeak web service via HTTP.
@@ -64,11 +89,7 @@ Table of contents:
      -S|--serial_port path to serial device.
      -h|--help        Show usage messaga.
 
-  2.3.2. munin/bitcurex.pl
-	bitcurex.pl python script is a munin script used for drawing munin charts of BTC
-   currency from well-known polish bitcoin stock. No configuration provided at the moment.
-
-  2.3.3. munin/DHT11
+  2.3.5. munin/DHT11
 	DHT11 is a python script used for drawing munin charts of humidity percentage from
    DHT11 sensor connected to raspberryPi (for details inspect fritzing sketch included in
    git repository and distribution pack).  The sensor itself can read also temperature,
@@ -79,8 +100,10 @@ Table of contents:
 
    [DHT11]
    user root 
-  
    
+  2.3.6. munin/lightlevel
+  2.3.7. munin/noise
+  2.3.8. munin/environmental
 
 
 

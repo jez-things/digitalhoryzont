@@ -15,7 +15,7 @@
 
 import os, sys, string, glob, socket, json
 plugin_name=list(os.path.split(sys.argv[0]))[1]
-plugin_version="3.0"
+plugin_version="0.1"
 rpc_host = os.getenv("host", "127.0.0.1")
 rpc_port = int(os.getenv("port", "4028"))
 #rpc_host = "127.0.0.1"
@@ -33,6 +33,98 @@ def cgminer_rpc(command):
    except socket.error as e:
       return None, str(e)
 
+def config_munin_graphs(cg_devs):
+    devno=0;
+    if 'DEVS' in cg_devs:
+        # Hashrate
+        print('multigraph cgminer_hashrate')
+        print('graph_category mining')
+        print('graph_title Hashrate')
+        print('graph_vlabel Hash/s')
+        print('graph_args --base 1000 --lower-limit 0')
+        devno=0;
+        for dev in cg_devs['DEVS']:
+            if 'Name' in dev:
+                print('pga_'+str(devno)+'.label '+dev['Name'])
+            else: # defaults to PGA device type
+                print('pga_'+str(devno)+'.label PGA '+str(devno))
+            print('pga_'+str(devno)+'.label PGA '+str(dev['Name']))
+            print('pga_'+str(devno)+'.type DERIVE')
+            print('pga_'+str(devno)+'.min 0')
+            print('pga_'+str(devno)+'.draw '+("AREA" if dev==cg_devs['DEVS'][0] else "STACK"))
+            devno+=1;
+
+        # Accepted
+        print('multigraph cgminer_accepted')
+        print('graph_category mining')
+        print('graph_title Accepted')
+        print('graph_vlabel task')
+        devno=0;
+        for dev in cg_devs['DEVS']:
+            print('pga_'+str(devno)+'.label '+dev['Name']+' '+str(devno))
+            print('pga_'+str(devno)+'.type DERIVE')
+            print('pga_'+str(devno)+'.min 0')
+            devno+=1;
+   
+        # Rejected
+        print('multigraph cgminer_rejected')
+        print('graph_category mining')
+        print('graph_title Rejected')
+        print('graph_vlabel task')
+        devno=0;
+        for dev in cg_devs['DEVS']:
+            print('pga_'+str(devno)+'.label '+dev['Name']+' '+str(devno))
+            print('pga_'+str(devno)+'.type DERIVE')
+            print('pga_'+str(devno)+'.min 0')
+            devno+=1;
+
+        # hwerrors
+        print('multigraph cgminer_hwerrors')
+        print('graph_category mining')
+        print('graph_title Hardware Errors')
+        print('graph_vlabel task')
+        devno=0;
+        for dev in cg_devs['DEVS']:
+            print('pga_'+str(devno)+'.label '+dev['Name']+' '+str(devno))
+            print('pga_'+str(devno)+'.type DERIVE')
+            print('pga_'+str(devno)+'.min 0')
+            devno+=1;
+
+        # Utility
+        print('multigraph cgminer_utility')
+        print('graph_category mining')
+        print('graph_title Utility')
+        print('graph_vlabel task')
+        devno=0;
+        for dev in cg_devs['DEVS']:
+            print('pga_'+str(devno)+'.label '+dev['Name']+' '+str(devno))
+            print('pga_'+str(devno)+'.type GAUGE')
+            print('pga_'+str(devno)+'.min 0')
+            devno+=1;
+
+        # Device Hardware %
+        print('multigraph cgminer_devicehw')
+        print('graph_category mining')
+        print('graph_title Device Hardware %')
+        print('graph_vlabel task')
+        devno=0;
+        for dev in cg_devs['DEVS']:
+            print('pga_'+str(devno)+'.label '+dev['Name']+' '+str(devno))
+            print('pga_'+str(devno)+'.type GAUGE')
+            print('pga_'+str(devno)+'.min 0')
+            devno+=1;
+
+        # Device rejected % 
+        print('multigraph cgminer_devicerej')
+        print('graph_category mining')
+        print('graph_title Device Rejected %')
+        print('graph_vlabel task')
+        devno=0;
+        for dev in cg_devs['DEVS']:
+            print('pga_'+str(devno)+'.label '+dev['Name']+' '+str(devno))
+            print('pga_'+str(devno)+'.type GAUGE')
+            devno+=1;
+
 #######################################################################
 # main
 #######################################################################
@@ -40,85 +132,7 @@ devs, err = cgminer_rpc('devs')
 
 arg = sys.argv[1] if len(sys.argv) == 2 else None
 if arg == "config":
-
-   print('multigraph cgminer_hashrate')
-   print('graph_category mining')
-   print('graph_title Hashrate')
-   print('graph_vlabel Hash/s')
-   print('graph_args --base 1000 --lower-limit 0')
-   if devs:
-      for dev in devs['DEVS']:
-         print('pga_'+str(dev['PGA'])+'.label PGA '+str(dev['PGA']))
-         print('pga_'+str(dev['PGA'])+'.type DERIVE')
-         print('pga_'+str(dev['PGA'])+'.min 0')
-         print('pga_'+str(dev['PGA'])+'.draw '+("AREA" if dev==devs['DEVS'][0] else "STACK"))
-
-   print('multigraph cgminer_accepted')
-   print('graph_category mining')
-   print('graph_title Accepted')
-   print('graph_vlabel task')
-   if devs:
-      for dev in devs['DEVS']:
-         print('pga_'+str(dev['PGA'])+'.label PGA '+str(dev['PGA']))
-         print('pga_'+str(dev['PGA'])+'.type DERIVE')
-         print('pga_'+str(dev['PGA'])+'.min 0')
-   
-   print('multigraph cgminer_rejected')
-   print('graph_category mining')
-   print('graph_title Rejected')
-   print('graph_vlabel task')
-   if devs:
-      for dev in devs['DEVS']:
-         print('pga_'+str(dev['PGA'])+'.label PGA '+str(dev['PGA']))
-         print('pga_'+str(dev['PGA'])+'.type DERIVE')
-         print('pga_'+str(dev['PGA'])+'.min 0')
-
-   print('multigraph cgminer_hwerrors')
-   print('graph_category mining')
-   print('graph_title Hardware Errors')
-   print('graph_vlabel task')
-   if devs:
-      for dev in devs['DEVS']:
-         print('pga_'+str(dev['PGA'])+'.label PGA '+str(dev['PGA']))
-         print('pga_'+str(dev['PGA'])+'.type DERIVE')
-         print('pga_'+str(dev['PGA'])+'.min 0')
-
-   print('multigraph cgminer_utility')
-   print('graph_category mining')
-   print('graph_title Utility')
-   print('graph_vlabel task')
-   if devs:
-      for dev in devs['DEVS']:
-         print('pga_'+str(dev['PGA'])+'.label PGA '+str(dev['PGA']))
-         print('pga_'+str(dev['PGA'])+'.type GAUGE')
-         print('pga_'+str(dev['PGA'])+'.min 0')
-   print('multigraph cgminer_devicehw')
-   print('graph_category mining')
-   print('graph_title Device Hardware %')
-   print('graph_vlabel task')
-   if devs:
-      for dev in devs['DEVS']:
-         print('pga_'+str(dev['PGA'])+'.label PGA '+str(dev['PGA']))
-         print('pga_'+str(dev['PGA'])+'.type GAUGE')
-         print('pga_'+str(dev['PGA'])+'.min 0')
-   
-   print('multigraph cgminer_devicerej')
-   print('graph_category mining')
-   print('graph_title Device Rejected %')
-   print('graph_vlabel task')
-   if devs:
-      for dev in devs['DEVS']:
-         print('pga_'+str(dev['PGA'])+'.label PGA '+str(dev['PGA']))
-         print('pga_'+str(dev['PGA'])+'.type GAUGE')
-
-   #print('multigraph cgminer_rejected')
-   #print('graph_category mining')
-   #print('graph_title PGA Fans')
-   #print('graph_vlabel %')
-   #print('graph_args -l 0 -u 100 -r')
-   #if devs:
-   #   for dev in devs['DEVS']:
-   #      print('pga_'+str(dev['PGA'])+'.label PGA '+str(dev['PGA']))
+    config_munin_graphs(devs);
 elif arg == "test":
     print('--------------------------------------------');
     if DEBUG_MODE > 0:
@@ -152,7 +166,7 @@ elif arg == "test":
         for dev in devs['DEVS']:
             for sk in dev.keys():
                 print("|%d \t%20s=%s" %(devno,sk,dev[sk]));
-        devno+=1;
+            devno+=1;
     print('--------------------------------------------');
 
 elif arg == "autoconf":
@@ -170,34 +184,32 @@ else:
       #print('multigraph cgminer_hashrate')
       devno=0;
       for dev in devs['DEVS']:
-        print('multigraph cgminer_hashrate')
-        print('pga_%d.value %d' % (devno, dev['Total MH']*1e6))
-        print('multigraph cgminer_accepted')
-        print('pga_%d.value %d' % (devno, dev['Accepted']))
-        print('multigraph cgminer_rejected')
-        print('pga_%d.value %d' % (devno, dev['Rejected']))
+        if 'Total MH' in dev:
+            print('multigraph cgminer_hashrate')
+            print('pga_%d.value %d' % (devno, dev['Total MH']*1e6))
+
+        if 'Accepted' in dev:
+            print('multigraph cgminer_accepted')
+            print('pga_%d.value %d' % (devno, dev['Accepted']))
+
+        if 'Rejected' in dev:
+            print('multigraph cgminer_rejected')
+            print('pga_%d.value %d' % (devno, dev['Rejected']))
+
+        if 'Hardware Errors' in dev:
+            print('multigraph cgminer_hwerrors')
+            print('pga_%d.value %d' % (devno, dev['Hardware Errors']))
+
+        if 'Utility' in dev:
+            print('multigraph cgminer_utility')
+            print('pga_%d.value %f' % (devno, dev['Utility']))
+
+        if 'Device Hardware%' in dev:
+            print('multigraph cgminer_devicehw')
+            print('pga_%d.value %f' % (devno, dev['Device Hardware%']))
+
+        if 'Device Rejected%' in dev:
+            print('multigraph cgminer_devicerej')
+            print('pga_%d.value %f' % (devno, dev['Device Rejected%']))
         devno+=1;
-
-      #print('multigraph cgminer_accepted')
-      #for dev in devs['DEVS']:
-      #   print('pga_%s.value %d' % (dev['PGA'], dev['Accepted']))
-      #for dev in devs['DEVS']:
-      #   print('pga_%s.value %d' % (dev['PGA'], dev['Rejected']))
-
-      print('multigraph cgminer_hwerrors')
-      for dev in devs['DEVS']:
-         print('pga_%s.value %d' % (dev['PGA'], dev['Hardware Errors']))
-      print('multigraph cgminer_utility')
-      for dev in devs['DEVS']:
-         print('pga_%s.value %f' % (dev['PGA'], dev['Utility']))
-      print('multigraph cgminer_devicehw')
-      for dev in devs['DEVS']:
-         print('pga_%s.value %f' % (dev['PGA'], dev['Device Hardware%']))
-      print('multigraph cgminer_devicerej')
-      for dev in devs['DEVS']:
-         print('pga_%s.value %f' % (dev['PGA'], dev['Device Rejected%']))
-#
-#	print('multigraph cgminer_rejected')
-#	for dev in devs['DEVS']:
-#		print('pga_%s.value %f' % (dev['PGA'], dev['Rejected']))
 
