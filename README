@@ -51,9 +51,16 @@ Table of contents:
                   It's supported on python2.x tested at the moment only on python2.7
       
   2.3. Configuration
+  2.3.1. readtemp.py
+	readtemp is a python script which runs on python 2.x version 3.x is not supported 
+  at the moment. Application reads data in form variable=value <space> ...
+  Then it sends all collected data to thingspeak web service via HTTP.
+  It accepts following command line arguments:
+     -d|--debug       Activates debugging mode.
+     -A|--apikey      API key for thingspeak.
+     -S|--serial_port path to serial device.
+     -h|--help        Show usage messaga.
 
-
-2) Configuration
 
 
 
