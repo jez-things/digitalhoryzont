@@ -33,7 +33,11 @@ munin_plugins () {
 }
 
 install_dependencies () {
-	dprint "|==> Installing software dependencies (supported only on rasbian)"
+	echo "|==> Installing software dependencies (supported only on rasbian)"
+	if ! which dpkg > /dev/null 2>&1; then
+		echo 'dpkg is not available. Aborting dependency installation.'
+		return 1;
+	fi
 	for dep in ${DH_DEPS};
 	do
 		dprint "|\`=> Checking $dep"
