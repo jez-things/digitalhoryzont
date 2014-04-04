@@ -19,6 +19,12 @@ Table of contents:
   2.1. Hardware Requirements
   2.2. Software Requirements
   2.3. Configuration
+  2.3.1. readtemp.py
+  2.3.2. munin/bitcurex.py
+  2.3.3. munin/DHT11
+  2.3.4. munin/polmine
+  2.3.5. munin/cgminer
+  2.3.6. munin/environmental
   
   3. Development information
   3.1. Introduction
@@ -40,11 +46,12 @@ Table of contents:
    Among several ways to install 
    Raspberry Pi, solderless board, 2x 4k7 resistors, DHT11, DS18B20.
   2.2. Software Requirements
+   Each script has different dependencies. 
+    readtemp.py - python2-serial python2-daemon
+                  It's supported on python2.x tested at the moment only on python2.7
       
-  2.3. 
+  2.3. Configuration
 
-it needs to run python2-serial, python2-daemon
-supported on python2.x tested only on python2.7
 
 2) Configuration
 
@@ -52,8 +59,15 @@ supported on python2.x tested only on python2.7
 
 
 3. Development information
+  	After this chapter you're supposed to be fluent with project development environment its
+  cycle and milestones. Also you're going to be familiar with our needs and direction where it goes.
+
   3.1. Introduction
-   Project is under a constant development both from conceptual part and functional part
+	Project is under a constant development both (even) from conceptual part and implementation.
+  Software disribution is splitted into two parts: mining scripts and monitoring of environment which
+  sometimes corresponts in some subtle aspects. The biggest and more complex part of the software pack
+  is weather/environment monitoring.
+
   3.2. Known bugs
    3.2.1. Reading 1byte from serial (readtemp.py)
          In case of connecting arduino for sensors script readtemp.py reads
