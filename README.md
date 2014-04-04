@@ -77,9 +77,10 @@ Table of contents:
    adafruit and available in git repository. Also script has to be runned by root (as munin does)
    or at least with suid. To run script as root following munin configuration
    has to be added in /etc/munin/munin-node.conf file:
-
+   ```
    [DHT11]
    user root 
+   ```
   
    
 
@@ -102,32 +103,10 @@ Table of contents:
          whole script "stressing" CPU time.  The possible solution is 
 
   3.3. Changelog
+```
    .--------------------------------------.
-   | Mon Mar 10 14:37:51 CET 2014         |
+   | Fri Apr  4 23:11:13 CEST 2014        |
    `--------------------------------------'
-   * Dodano daemon mode
-   * Dodano wsparcie dla syslog
-   * Mozliwosc podlaczenia arduino do raspberry pi
-   * Skrypt startujacy usluge
+   * First pre-release
    
-   .--------------------------------------.
-   | Mon Mar 10 17:36:10 CET 2014         |
-   `--------------------------------------'
-   * Czyszczenie kodu
-   
-   .--------------------------------------.
-   | Tue Mar 11 14:42:55 CET 2014         |
-   `--------------------------------------'
-   * Przekierowanie stdout i stderr na terminal (w celu debugowania)
-   
-   .--------------------------------------.
-   | Tue Mar 11 18:47:32 CET 2014         |
-   `--------------------------------------'
-   Mar 11 18:29:46 raszpla readtemp.py: conversion failure "invalid literal for float(): 331..00"
-   Blad konwersji skutkuje wylaczenie sie daemona
-   
-   .--------------------------------------.
-   | Mon Mar 17 10:13:10 CET 2014         |
-   `--------------------------------------'
-   Support for getopt(3)
-   
+```
