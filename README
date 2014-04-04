@@ -1,41 +1,92 @@
+
+
+Digital horyzon
+
+Abstract
+
+Internet of things: set of phyton scripts for collecting data from raspberryPi
+by external sensors (e.g. temperature, humidity, light) and bitcoin mining 
+hardware, sending to munin on external box. 
+
+
+Table of contents: 
+  1. Introduction 
+  
+  1.1. Preface
+
+  2. Installation 
+
+  2.1. Hardware Requirements
+  2.2. Software Requirements
+  2.3. Configuration
+  
+  3. Development information
+  3.1. Introduction
+  3.2. Known bugs
+  3.3. Changelog
+
+------------------------------------------------------------------------------
+
+1. Introduction
+----
+  1.1. Preface
+   Internet of things: set of phyton scripts for collecting data from raspberry Pi by external sensors 
+   (e.g. temperature, humidity, light) and bitcoin mining hardware, sending to munin on external box. 
+   ...
+
+2. Installation 
+
+  2.1. Hardware Requirements
+   Among several ways to install 
+   Raspberry Pi, solderless board, 2x 4k7 resistors, DHT11, DS18B20.
+  2.2. Software Requirements
+      
+  2.3. 
+
 it needs to run python2-serial, python2-daemon
 supported on python2.x tested only on python2.7
 
-
-.--------------------------------------.
-| Mon Mar 10 14:37:51 CET 2014         |
-`--------------------------------------'
-* Dodano daemon mode
-* Dodano wsparcie dla syslog
-* Mozliwosc podlaczenia arduino do raspberry pi
-* Skrypt startujacy usluge
-
-.--------------------------------------.
-| Mon Mar 10 17:36:10 CET 2014         |
-`--------------------------------------'
-* Czyszczenie kodu
-
-.--------------------------------------.
-| Tue Mar 11 14:42:55 CET 2014         |
-`--------------------------------------'
-* Przekierowanie stdout i stderr na terminal (w celu debugowania)
-
-.--------------------------------------.
-| Tue Mar 11 18:47:32 CET 2014         |
-`--------------------------------------'
-Mar 11 18:29:46 raszpla readtemp.py: conversion failure "invalid literal for float(): 331..00"
-Blad konwersji skutkuje wylaczenie sie daemona
-
-.--------------------------------------.
-| Mon Mar 17 10:13:10 CET 2014         |
-`--------------------------------------'
-Support for getopt(3)
+2) Configuration
 
 
-NOTES:
-1) Nie przetestowano pobierania danych z serial dla arduino.
 
 
-BUGS:
-reading 1byte from serial
+3. Development information
+  3.1. Introduction
+   Project is under a constant development both from conceptual part and functional part
+  3.2. Known bugs
+   3.2.1. Reading 1byte from serial (readtemp.py)
+         In case of connecting arduino for sensors script readtemp.py reads
+         1byte in from serial making too much of overload in communication making the
+         whole script "stressing" CPU time.  The possible solution is 
 
+  3.3. Changelog
+   .--------------------------------------.
+   | Mon Mar 10 14:37:51 CET 2014         |
+   `--------------------------------------'
+   * Dodano daemon mode
+   * Dodano wsparcie dla syslog
+   * Mozliwosc podlaczenia arduino do raspberry pi
+   * Skrypt startujacy usluge
+   
+   .--------------------------------------.
+   | Mon Mar 10 17:36:10 CET 2014         |
+   `--------------------------------------'
+   * Czyszczenie kodu
+   
+   .--------------------------------------.
+   | Tue Mar 11 14:42:55 CET 2014         |
+   `--------------------------------------'
+   * Przekierowanie stdout i stderr na terminal (w celu debugowania)
+   
+   .--------------------------------------.
+   | Tue Mar 11 18:47:32 CET 2014         |
+   `--------------------------------------'
+   Mar 11 18:29:46 raszpla readtemp.py: conversion failure "invalid literal for float(): 331..00"
+   Blad konwersji skutkuje wylaczenie sie daemona
+   
+   .--------------------------------------.
+   | Mon Mar 17 10:13:10 CET 2014         |
+   `--------------------------------------'
+   Support for getopt(3)
+   
