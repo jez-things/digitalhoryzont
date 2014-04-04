@@ -13,32 +13,30 @@ set of scripts to monitor bitcoin mining hardware through munin on external serv
 
 Table of contents: 
 ===============
-  # 1. Introduction 
-  ## 1.1. Preface
-
-  #   2. Installation 
-  ##  2.1. Hardware Requirements
-  ##  2.2. Software Requirements
-  ##  2.3. Configuration
-  ### 2.3.1. munin/bitcurex.py
-  ### 2.3.2. munin/polmine
-  ### 2.3.3. munin/cgminer
-  ### 2.3.4. readtemp.py
-  ### 2.3.5. munin/DHT11
-  ### 2.3.6. munin/lightlevel
-  ### 2.3.7. munin/noise
-  ### 2.3.8. munin/environmental
-  
-  # 3. Development information
-  ## 3.1. Introduction
-  ## 3.2. Known bugs
-  ## 3.3. Changelog
+# 1. Introduction 
+## 1.1. Preface
+#   2. Installation 
+##  2.1. Hardware Requirements
+##  2.2. Software Requirements
+##  2.3. Configuration
+### 2.3.1. munin/bitcurex.py
+### 2.3.2. munin/polmine
+### 2.3.3. munin/cgminer
+### 2.3.4. readtemp.py
+### 2.3.5. munin/DHT11
+### 2.3.6. munin/lightlevel
+### 2.3.7. munin/noise
+### 2.3.8. munin/environmental
+# 3. Development information
+## 3.1. Introduction
+## 3.2. Known bugs
+## 3.3. Changelog
 
 ------------------------------------------------------------------------------
 
 # 1. Introduction
 ----
-  ## 1.1. Preface
+## 1.1. Preface
     Internet of things: set of phyton scripts for collecting data from raspberryPi
     by external sensors (e.g. temperature, humidity and light). Additionaly it contains
     set of scripts to monitor bitcoin mining hardware through munin on external server. 
@@ -46,28 +44,28 @@ Table of contents:
 
 # 2. Installation 
 
-  ## 2.1. Hardware Requirements
+## 2.1. Hardware Requirements
    Among several ways to install 
    Raspberry Pi, solderless board, 2x 4k7 resistors, DHT11, DS18B20.
-  ## 2.2. Software Requirements
+## 2.2. Software Requirements
    Each script has different dependencies. 
     readtemp.py - python2-serial python2-daemon
                   It's supported on python2.x tested at the moment only on python2.7
       
-  ## 2.3. Configuration
+## 2.3. Configuration
 
   *TODO*
 
-  ### 2.3.1. munin/bitcurex.py
+### 2.3.1. munin/bitcurex.py
 
 	*bitcurex.pl* python script is a munin script used for drawing munin charts of BTC
    currency from well-known polish bitcoin stock. No configuration provided at the moment.
 
-  ### 2.3.2. munin/polmine
+### 2.3.2. munin/polmine
 
 	*polmine* script to graph polmine statistics like hashrate
 
-  ### 2.3.3. munin/cgminer
+### 2.3.3. munin/cgminer
 	*cgminer* is a python script which draws munin charts of cgminer and tools which
   support JSON API of cgminer or tools derived from cgminer e.g. bfgminer. There are
   two configuration options available: *rpc_port* and *rpc_host*. There's no need to
@@ -82,15 +80,15 @@ Table of contents:
   When cgminer is run with a test option it connects to given *rpc_host* on a given *rpc_port*
   and prints all variables available.
 
-  ### 2.3.4. readtemp.py
+### 2.3.4. readtemp.py
 	readtemp is a python script which runs on python 2.x version 3.x is not supported 
   at the moment. Application reads data in form variable=value <space> ...
   Then it sends all collected data to thingspeak web service via HTTP.
   It accepts following command line arguments:
-     * -d|--debug       Activates debugging mode.
-     * -A|--apikey      API key for thingspeak.
-     * -S|--serial_port path to serial device.
-     * -h|--help        Show usage messaga.
+* -d|--debug       Activates debugging mode.
+* -A|--apikey      API key for thingspeak.
+* -S|--serial_port path to serial device.
+* -h|--help        Show usage messaga.
 
 ###  2.3.5. munin/DHT11
 	DHT11 is a python script used for drawing munin charts of humidity percentage from
