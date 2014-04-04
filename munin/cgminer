@@ -16,10 +16,11 @@
 import os, sys, string, glob, socket, json
 plugin_name=list(os.path.split(sys.argv[0]))[1]
 plugin_version="3.0"
-#rpc_host = os.getenv("host", "localhost")
-#rpc_port = int(os.getenv("port", 4028))
-rpc_host = "127.0.0.1"
-rpc_port = 4028;
+rpc_host = os.getenv("host", "127.0.0.1")
+rpc_port = int(os.getenv("port", "4028"))
+#rpc_host = "127.0.0.1"
+#rpc_port = 4028;
+DEBUG_MODE=0;
 
 def cgminer_rpc(command):
    try:
@@ -32,10 +33,14 @@ def cgminer_rpc(command):
    except socket.error as e:
       return None, str(e)
 
+#######################################################################
+# main
+#######################################################################
 devs, err = cgminer_rpc('devs')
 
 arg = sys.argv[1] if len(sys.argv) == 2 else None
 if arg == "config":
+
    print('multigraph cgminer_hashrate')
    print('graph_category mining')
    print('graph_title Hashrate')
@@ -114,12 +119,47 @@ if arg == "config":
    #if devs:
    #   for dev in devs['DEVS']:
    #      print('pga_'+str(dev['PGA'])+'.label PGA '+str(dev['PGA']))
-   
+elif arg == "test":
+    print('--------------------------------------------');
+    if DEBUG_MODE > 0:
+        print(devs)
+        for dk in devs.keys():
+            print("|dk devs[dk] %20s=%s" %(dk, devs[dk]));
+    print('-------');
+    if DEBUG_MODE > 0:
+        print(devs['STATUS']);
+    if devs['STATUS']:
+        devno=0;
+        for dk in devs['STATUS']:
+            #print("| %20s" % (dk));
+            for sk in dk.keys():
+                print("|%d)\t%20s=%s" % (devno,sk,dk[sk]));
+            devno+=1;
+
+    #for dk in devs['STATUS'].keys():
+    #    print("| %20s=%s" %(dk, devs['STATUS'][dk]));
+    print('-------');
+
+    if DEBUG_MODE > 0:
+        print(devs['DEVS']);
+    print('--------------------------------------------');
+    if devs and DEBUG_MODE > 0:
+        for dev in devs['DEVS']:
+            print("\tdev: %s" % (devs));
+    print('-------');
+    devno=0;
+    if devs:
+        for dev in devs['DEVS']:
+            for sk in dev.keys():
+                print("|%d \t%20s=%s" %(devno,sk,dev[sk]));
+        devno+=1;
+    print('--------------------------------------------');
+
 elif arg == "autoconf":
    if err:
       print("no ("+err+")")
    elif len(devs['DEVS']) == 0:
-      print("no (no pga found)")
+      print("no (no mining device found)")
    else:
       print("yes")
 #elif arg == "suggest":
@@ -127,15 +167,22 @@ elif arg == "version":
    print(plugin_name+' Munin plugin, version '+plugin_version)
 else:
    if devs:
-      print('multigraph cgminer_hashrate')
+      #print('multigraph cgminer_hashrate')
+      devno=0;
       for dev in devs['DEVS']:
-         print('pga_%s.value %d' % (dev['PGA'], dev['Total MH']*1e6))
-      print('multigraph cgminer_accepted')
-      for dev in devs['DEVS']:
-         print('pga_%s.value %d' % (dev['PGA'], dev['Accepted']))
-      print('multigraph cgminer_rejected')
-      for dev in devs['DEVS']:
-         print('pga_%s.value %d' % (dev['PGA'], dev['Rejected']))
+        print('multigraph cgminer_hashrate')
+        print('pga_%d.value %d' % (devno, dev['Total MH']*1e6))
+        print('multigraph cgminer_accepted')
+        print('pga_%d.value %d' % (devno, dev['Accepted']))
+        print('multigraph cgminer_rejected')
+        print('pga_%d.value %d' % (devno, dev['Rejected']))
+        devno+=1;
+
+      #print('multigraph cgminer_accepted')
+      #for dev in devs['DEVS']:
+      #   print('pga_%s.value %d' % (dev['PGA'], dev['Accepted']))
+      #for dev in devs['DEVS']:
+      #   print('pga_%s.value %d' % (dev['PGA'], dev['Rejected']))
 
       print('multigraph cgminer_hwerrors')
       for dev in devs['DEVS']:
