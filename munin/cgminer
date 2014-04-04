@@ -166,7 +166,7 @@ elif arg == "test":
         for dev in devs['DEVS']:
             for sk in dev.keys():
                 print("|%d \t%20s=%s" %(devno,sk,dev[sk]));
-        devno+=1;
+            devno+=1;
     print('--------------------------------------------');
 
 elif arg == "autoconf":
