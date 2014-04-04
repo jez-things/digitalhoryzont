@@ -91,7 +91,7 @@ fi
 get_light_level () 
 {
 
-	printf "l.value %d\n" "$(/home/jez/bin/lightlevel)"
+	printf "l.value %d\n" "$(/usr/local/bin/lightlevel)"
 
 }
 
