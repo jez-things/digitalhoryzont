@@ -125,6 +125,18 @@ def config_munin_graphs(cg_devs):
             print('pga_'+str(devno)+'.type GAUGE')
             devno+=1;
 
+def print_opt_value(oname, dev, devno):
+    if o in dev:
+        if type(dev[o]) is float:
+            if o == 'Total MH':
+                print ("pga_%d.value %d" % (devno, dev[o]*1e6));
+            else:
+                print ("pga_%d.value %f" % (devno, dev[o]));
+        else:
+            print ("pga_%d.value %i" % (devno, dev[o]));
+    else:
+        print ("pga_%d.value %i" % (devno, -1));
+
 #######################################################################
 # main
 #######################################################################
@@ -183,33 +195,22 @@ else:
    if devs:
       #print('multigraph cgminer_hashrate')
       devno=0;
-      for dev in devs['DEVS']:
-        if 'Total MH' in dev:
-            print('multigraph cgminer_hashrate')
-            print('pga_%d.value %d' % (devno, dev['Total MH']*1e6))
+      opts={'Total MH':["cgminer_hashrate"],
+            'Accepted':["cgminer_accepted"],
+            'Rejected':["cgminer_rejected"],
+            'Hardware Errors':["cgminer_hwerrors"],
+            'Utility':["cgminer_utility"],
+            #'Utility':["cgminer_utility"],
+            'Device Hardware%':["cgminer_devicehw"],
+            'Device Rejected%':["cgminer_devicerej"],
+            'Temperature':["cgminer_temperature"]
+            }
+      for o in opts.keys():
+          print ("multigraph %s" %(opts[o][0]));
+          devno=0;
+          for dev in devs['DEVS']:
+              print_opt_value(o, dev, devno);
+              devno+=1;
 
-        if 'Accepted' in dev:
-            print('multigraph cgminer_accepted')
-            print('pga_%d.value %d' % (devno, dev['Accepted']))
 
-        if 'Rejected' in dev:
-            print('multigraph cgminer_rejected')
-            print('pga_%d.value %d' % (devno, dev['Rejected']))
-
-        if 'Hardware Errors' in dev:
-            print('multigraph cgminer_hwerrors')
-            print('pga_%d.value %d' % (devno, dev['Hardware Errors']))
-
-        if 'Utility' in dev:
-            print('multigraph cgminer_utility')
-            print('pga_%d.value %f' % (devno, dev['Utility']))
-
-        if 'Device Hardware%' in dev:
-            print('multigraph cgminer_devicehw')
-            print('pga_%d.value %f' % (devno, dev['Device Hardware%']))
-
-        if 'Device Rejected%' in dev:
-            print('multigraph cgminer_devicerej')
-            print('pga_%d.value %f' % (devno, dev['Device Rejected%']))
-        devno+=1;
 
