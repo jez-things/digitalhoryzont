@@ -125,6 +125,40 @@ def config_munin_graphs(cg_devs):
             print('pga_'+str(devno)+'.type GAUGE')
             devno+=1;
 
+        # Diff1 Work
+        print('multigraph cgminer_diff1work')
+        print('graph_category mining')
+        print('graph_title Diff1 Work ')
+        print('graph_vlabel task')
+        devno=0;
+        for dev in cg_devs['DEVS']:
+            print('pga_'+str(devno)+'.label '+dev['Name']+' '+str(devno))
+            print('pga_'+str(devno)+'.type COUNTER')
+            devno+=1;
+
+        # Last Share Difficulty
+
+        print('multigraph cgminer_lastsharedif')
+        print('graph_category mining')
+        print('graph_title Last Share Difficulty')
+        print('graph_vlabel task')
+        devno=0;
+        for dev in cg_devs['DEVS']:
+            print('pga_'+str(devno)+'.label '+dev['Name']+' '+str(devno))
+            print('pga_'+str(devno)+'.type COUNTER')
+            devno+=1;
+        
+        # Device Elapsed
+        print('multigraph cgminer_deviceelapsed')
+        print('graph_category mining')
+        print('graph_title Device Elapsed')
+        print('graph_vlabel task')
+        devno=0;
+        for dev in cg_devs['DEVS']:
+            print('pga_'+str(devno)+'.label '+dev['Name']+' '+str(devno))
+            print('pga_'+str(devno)+'.type COUNTER')
+            devno+=1;
+
 def print_opt_value(oname, dev, devno):
     if o in dev:
         if type(dev[o]) is float:
@@ -203,7 +237,10 @@ else:
             #'Utility':["cgminer_utility"],
             'Device Hardware%':["cgminer_devicehw"],
             'Device Rejected%':["cgminer_devicerej"],
-            'Temperature':["cgminer_temperature"]
+            'Temperature':["cgminer_temperature"],
+            'Diff1 Work':["cgminer_diff1work"],
+            'Last Share Difficulty':["cgminer_lastsharedif"],
+            'Device Elapsed':["cgminer_deviceelapsed"]
             }
       for o in opts.keys():
           print ("multigraph %s" %(opts[o][0]));
