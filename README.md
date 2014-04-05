@@ -66,7 +66,10 @@ set of scripts to monitor bitcoin mining hardware through munin on external serv
 ### 2.3.2. munin/polmine
 
    **polmine** script to graph polmine statistics like hashrate
-
+```
+[polmine]
+api_key 6ce66da6a3870568297b18ff0be1cddb
+```
 ### 2.3.3. munin/cgminer
   **cgminer** is a python script which draws munin charts of cgminer and tools which
   support JSON API of cgminer or tools derived from cgminer e.g. bfgminer. There are
@@ -123,7 +126,11 @@ user root
    It uses simply procfs to access 1-Wire devices. There are several variables possibles
    to customize charts. There are no software limits for graphed devices.
    ```
-   
+[environmental]
+env.ds18b20_0000055a7e65_label Window
+env.ds18b20_000005b4093e_label Outside
+env.ds18b20_0000052cf709_label Inside
+
    ```
 
 
@@ -144,7 +151,7 @@ In case of connecting arduino for sensors script readtemp.py reads
 1byte in from serial making too much of overload in communication making the
 whole script "stressing" CPU time.  The possible solution is 
 
-###  3.3. Changelog
+##  3.3. Changelog
 ```
    .--------------------------------------.
    | Fri Apr  4 23:11:13 CEST 2014        |
