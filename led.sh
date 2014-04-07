@@ -45,6 +45,7 @@ set_state () {
 		*)
 			G_STATE="${lstate}"
 			set_led down;
+			echo "unknown led state specified\"${lstate}\""|logger 
 			return 0
 			;;
 
@@ -53,7 +54,7 @@ set_state () {
 }
 
 check_ds18b20 () {
-	ds18_cnt=$(egrep -c '(28-000005b4093e|28-0000052cf709|28-0000055a7e65)' /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves )
+	ds18_cnt=$(egrep -c '28-[a-fA-F0-9]*' /sys/bus/w1/devices/w1_bus_master1/w1_master_slaves )
 	if [ $ds18_cnt -lt 3 ]; then
 		return 0;
 	fi
@@ -61,7 +62,7 @@ check_ds18b20 () {
 }
 
 check_inet () {
-	if ! ping -c 4 10.8.0.1 > /dev/null 2>&1; then
+	if ! ping -W 1 -c 4 10.8.0.1 > /dev/null 2>&1; then
 		return 0;
 	fi
 	return 1;	
@@ -69,19 +70,19 @@ check_inet () {
 
 do_stdtest () {
 
-	set_state valid;
+	set_state "valid";
 	if check_ds18b20; then
-		echo 'problem with i2c bus' | logger -t check_state
-		set_state error;
+		echo 'problem with i2c bus' | logger 
+		set_state "error";
 	fi
 	if check_inet; then
-		echo 'problem with internet connection' | logger -t check_state
-		set_state error;
+		echo 'problem with internet connection' | logger
+		set_state "error";
 	fi
 }
 
 do_init () {
-	echo 'initialization of leds' | logger -t check_state
+	echo 'initialization of leds' | logger 
 	init_led;
 }
 
