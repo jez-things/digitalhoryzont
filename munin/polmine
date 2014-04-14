@@ -28,6 +28,7 @@ except Exception as e:
     
 arg = sys.argv[1] if len(sys.argv) == 2 else None
 if arg == "config":
+    print('multigraph polmine_payout_balance');
     print('graph_title payout/balance');
     print('graph_vlabel BTC');
     print('graph_category polmine');
@@ -41,9 +42,52 @@ if arg == "config":
     print('payout.label payout');
     print('payout.min 0');
     print('payout.max 2');
+    # hashrate of each worker
+    print('multigraph polmine_workers_hashrate');
+    print('graph_title Hashrate per worker');
+    print('graph_vlabel Hashrate');
+    print('graph_category polmine');
+    #print('graph_scale no');
+    #print('graph_order payout h');
+    wno=0;
+    for w in acctd['workers'].keys():
+	#print acctd['workers'][w];
+	print('%s.label %s' % (w,w));
+	print('%s.type GAUGE' %(w));
+	print('%s.draw %s' %(w,("AREA" if wno==0 else "STACK" )));
+	wno+=1;
+    # hashrate of each worker
+    print('multigraph polmine_workers_shares');
+    print('graph_title Shares per worker');
+    print('graph_vlabel Shares');
+    print('graph_category polmine');
+    wno=0;
+    for w in acctd['workers'].keys():
+	#print acctd['workers'][w];
+	print('%s.label %s' % (w,w));
+	print('%s.type DERIVE' %(w));
+	print('%s.draw %s' %(w,("AREA" if wno==0 else "STACK" )));
+	wno+=1;
+elif arg == "test":
+    print('#test');    
+    print(acctd);
+    for a in acctd.keys():
+	print('acctd %s = %s' %(a, acctd[a]));
+    print('#workers:');
+    for w in acctd['workers'].keys():
+	print acctd['workers'][w];
     
 else:
+    print('multigraph polmine_payout_balance');
     print('h.value %f' %(float(acctd['balance'])) );
     print('payout.value %f' %(float(acctd['payout'])) );
+    print('multigraph polmine_workers_hashrate');
+    for w in acctd['workers'].keys():
+	#print acctd['workers'][w];
+	print('%s.value %f' %(w,  float(acctd['workers'][w]['speed'])) );
+    print('multigraph polmine_workers_shares');
+    for w in acctd['workers'].keys():
+	#print acctd['workers'][w];
+	print('%s.value %d' %(w,  int(acctd['workers'][w]['shares'])) );
 
 
