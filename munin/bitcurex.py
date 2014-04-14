@@ -28,6 +28,7 @@ except Exception as e:
     
 arg = sys.argv[1] if len(sys.argv) == 2 else None
 if arg == "config":
+    print('multigraph bitcurex_sell_buy');
     print('graph_title bitcurex BTC/PLN');
     print('graph_vlabel PLN');
     print('graph_category bitcoin');
@@ -36,11 +37,38 @@ if arg == "config":
     print('h.type GAUGE');
     print('b.label BTC buy');
     print('b.type GAUGE');
+
+    print('multigraph bitcurex_vol');
+    print('graph_title bitcurex volume');
+    print('graph_vlabel BTC');
+    print('graph_category bitcoin');
+    print('v.label Volume of BTC');
+    print('v.draw AREA');
+    print('v.type GAUGE');
+
+    print('multigraph bitcurex_high_low_avg');
+    print('graph_title bitcurex high/low/avg');
+    print('graph_vlabel PLN');
+    print('graph_category bitcoin');
+    print('l.label Lowest price');
+    print('l.draw AREA');
+    print('l.type GAUGE');
+    print('h.label Highest price');
+    print('h.type GAUGE');
+    print('a.label Average');
+    print('a.type GAUGE');
 elif arg == "test":
     print accs;
 else:
+    print('multigraph bitcurex_sell_buy');
     print('h.value %f' %(accs['sell']));
     print('b.value %f' %(accs['buy']));
+    print('multigraph bitcurex_vol');
+    print('v.value %f' %(accs['vol']));
+    print('multigraph bitcurex_high_low_avg');
+    print('l.value %f' %(accs['low']));
+    print('h.value %f' %(accs['high']));
+    print('a.value %f' %(accs['avg']));
 #else:
     #print('h.value %d' 
 
