@@ -43,6 +43,7 @@ install_dependencies () {
 		dprint "|\`=> Checking $dep"
 		if ! dpkg -l $dep > /dev/null 2>&1; then
 			dprint "|===> $dep not installed!"
+			apt-get install -y $dep
 		fi
 	done
 
