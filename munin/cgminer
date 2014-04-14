@@ -145,7 +145,7 @@ def config_munin_graphs(cg_devs):
         devno=0;
         for dev in cg_devs['DEVS']:
             print('pga_'+str(devno)+'.label '+dev['Name']+' '+str(devno))
-            print('pga_'+str(devno)+'.type COUNTER')
+            print('pga_'+str(devno)+'.type GAUGE')
             devno+=1;
         
         # Device Elapsed
