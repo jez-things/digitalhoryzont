@@ -15,6 +15,7 @@ All Linux systems
 The following is default configuration
 
   [electrocity]
+  user root
   env.pidfile /var/run/mqttrcv.pid
   
 
