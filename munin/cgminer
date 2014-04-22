@@ -6,9 +6,10 @@
 #
 # Optional configuration:
 #
-# [cgminer]
+# [cgminer_192_168_0_199]
 # env.host = 'localhost'
 # env.port = 4028
+# env.srvname = 192_168_0_199
 #
 #%# capabilities=autoconf
 #%# family=auto
