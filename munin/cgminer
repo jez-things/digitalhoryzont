@@ -16,8 +16,20 @@
 import os, sys, string, glob, socket, json
 plugin_name=list(os.path.split(sys.argv[0]))[1]
 plugin_version="0.1"
+# Options:
 rpc_host = os.getenv("host", "127.0.0.1")
 rpc_port = int(os.getenv("port", "4028"))
+srvname = os.getenv("srvname", "")
+
+def get_srvname(srvname):
+	ret = "";
+	if len(srvname) > 0:
+		ret = "_%s" %(srvname);
+	else:
+		ret = "";
+	return ret;
+		
+	
 #rpc_host = "127.0.0.1"
 #rpc_port = 4028;
 DEBUG_MODE=0;
@@ -37,7 +49,7 @@ def config_munin_graphs(cg_devs):
     devno=0;
     if 'DEVS' in cg_devs:
         # Hashrate
-        print('multigraph cgminer_hashrate')
+        print('multigraph cgminer_hashrate'+get_srvname(srvname))
         print('graph_category mining')
         print('graph_title Hashrate')
         print('graph_vlabel Hash/s')
@@ -55,7 +67,7 @@ def config_munin_graphs(cg_devs):
             devno+=1;
 
         # Accepted
-        print('multigraph cgminer_accepted')
+        print('multigraph cgminer_accepted'+get_srvname(srvname))
         print('graph_category mining')
         print('graph_title Accepted')
         print('graph_vlabel task')
@@ -67,7 +79,7 @@ def config_munin_graphs(cg_devs):
             devno+=1;
    
         # Rejected
-        print('multigraph cgminer_rejected')
+        print('multigraph cgminer_rejected'+get_srvname(srvname))
         print('graph_category mining')
         print('graph_title Rejected')
         print('graph_vlabel task')
@@ -79,7 +91,7 @@ def config_munin_graphs(cg_devs):
             devno+=1;
 
         # hwerrors
-        print('multigraph cgminer_hwerrors')
+        print('multigraph cgminer_hwerrors'+get_srvname(srvname))
         print('graph_category mining')
         print('graph_title Hardware Errors')
         print('graph_vlabel task')
@@ -91,7 +103,7 @@ def config_munin_graphs(cg_devs):
             devno+=1;
 
         # Utility
-        print('multigraph cgminer_utility')
+        print('multigraph cgminer_utility'+get_srvname(srvname))
         print('graph_category mining')
         print('graph_title Utility')
         print('graph_vlabel task')
@@ -103,7 +115,7 @@ def config_munin_graphs(cg_devs):
             devno+=1;
 
         # Device Hardware %
-        print('multigraph cgminer_devicehw')
+        print('multigraph cgminer_devicehw'+get_srvname(srvname))
         print('graph_category mining')
         print('graph_title Device Hardware %')
         print('graph_vlabel task')
@@ -115,7 +127,7 @@ def config_munin_graphs(cg_devs):
             devno+=1;
 
         # Device rejected % 
-        print('multigraph cgminer_devicerej')
+        print('multigraph cgminer_devicerej'+get_srvname(srvname))
         print('graph_category mining')
         print('graph_title Device Rejected %')
         print('graph_vlabel task')
@@ -126,7 +138,7 @@ def config_munin_graphs(cg_devs):
             devno+=1;
 
         # Diff1 Work
-        print('multigraph cgminer_diff1work')
+        print('multigraph cgminer_diff1work'+get_srvname(srvname))
         print('graph_category mining')
         print('graph_title Diff1 Work ')
         print('graph_vlabel task')
@@ -138,7 +150,7 @@ def config_munin_graphs(cg_devs):
 
         # Last Share Difficulty
 
-        print('multigraph cgminer_lastsharedif')
+        print('multigraph cgminer_lastsharedif'+get_srvname(srvname))
         print('graph_category mining')
         print('graph_title Last Share Difficulty')
         print('graph_vlabel task')
@@ -149,7 +161,7 @@ def config_munin_graphs(cg_devs):
             devno+=1;
         
         # Device Elapsed
-        print('multigraph cgminer_deviceelapsed')
+        print('multigraph cgminer_deviceelapsed'+get_srvname(srvname))
         print('graph_category mining')
         print('graph_title Device Elapsed')
         print('graph_vlabel task')
@@ -243,7 +255,7 @@ else:
             'Device Elapsed':["cgminer_deviceelapsed"]
             }
       for o in opts.keys():
-          print ("multigraph %s" %(opts[o][0]));
+          print ("multigraph %s%s" %(opts[o][0],get_srvname(srvname)));
           devno=0;
           for dev in devs['DEVS']:
               print_opt_value(o, dev, devno);
