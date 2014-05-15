@@ -1,0 +1,211 @@
+#!/bin/sh
+
+: <<=cut
+
+=head1 NAME
+
+environmental - Plugin to monitor light level
+
+=head1 APPLICABLE SYSTEMS
+
+All Linux systems
+
+=head1 CONFIGURATION
+
+The following is default configuration
+
+  [lightlevel]
+  user root
+
+
+=head2 EXAMPLE WARNING AND CRITICAL SETTINGS
+It is necessary to run this script as root
+
+=head1 INTERPRETATION
+
+
+=head1 MAGIC MARKERS
+
+  #%# family=auto
+  #%# capabilities=autoconf
+
+
+=head1 VERSION
+
+  $Id$
+
+=head1 BUGS
+
+
+Otherwise none known
+
+=head1 AUTHOR
+
+Unknown
+
+=head1 LICENSE
+
+BSD
+
+=cut
+
+. $MUNIN_LIBDIR/plugins/plugin.sh
+
+if [ "$1" = "autoconf" ]; then
+	if [ -r /proc/stat ]; then
+		echo yes
+		exit 0
+	else
+		echo no
+		exit 0
+	fi
+fi
+
+
+extinfo=""
+
+volts_core="$(/opt/vc/bin/vcgencmd measure_volts core |cut -d '=' -f 2 |sed -e 's/V$//g')"
+volts_sdram_c="$(/opt/vc/bin/vcgencmd measure_volts sdram_c |cut -d '=' -f 2 |sed -e 's/V$//g')"
+volts_sdram_i="$(/opt/vc/bin/vcgencmd measure_volts sdram_i |cut -d '=' -f 2 |sed -e 's/V$//g')"
+volts_sdram_p="$(/opt/vc/bin/vcgencmd measure_volts sdram_p|cut -d '=' -f 2 |sed -e 's/V$//g' )"
+temp="$(/opt/vc/bin/vcgencmd measure_temp |cut -d '=' -f 2|sed -e 's/.C$//g')"
+freq_arm="$(/opt/vc/bin/vcgencmd measure_clock arm |cut -d '=' -f 2)"
+freq_core="$(/opt/vc/bin/vcgencmd measure_clock core |cut -d '=' -f 2)"
+freq_h264="$(/opt/vc/bin/vcgencmd measure_clock h264|cut -d '=' -f 2 )"
+freq_isp="$(/opt/vc/bin/vcgencmd measure_clock isp|cut -d '=' -f 2 )"
+freq_v3d="$(/opt/vc/bin/vcgencmd measure_clock v3d|cut -d '=' -f 2 )"
+freq_uart="$(/opt/vc/bin/vcgencmd measure_clock uart|cut -d '=' -f 2 )"
+freq_pwm="$(/opt/vc/bin/vcgencmd measure_clock pwm|cut -d '=' -f 2 )"
+freq_emmc="$(/opt/vc/bin/vcgencmd measure_clock emmc|cut -d '=' -f 2 )"
+freq_pixel="$(/opt/vc/bin/vcgencmd measure_clock pixel|cut -d '=' -f 2 )"
+freq_vec="$(/opt/vc/bin/vcgencmd measure_clock vec|cut -d '=' -f 2 )"
+freq_hdmi="$(/opt/vc/bin/vcgencmd measure_clock hdmi|cut -d '=' -f 2 )"
+freq_dpi="$(/opt/vc/bin/vcgencmd measure_clock dpi|cut -d '=' -f 2 )"
+
+if [ "$1" = "config" ]; then
+	echo 'multigraph rpi_volts'
+	echo 'graph_category rpi'
+	echo 'graph_title volts'
+        echo 'graph_vlabel V'
+	echo 'volts_core.label core'
+	echo 'volts_core.type GAUGE'
+	echo 'volts_core.min 0'
+	echo 'volts_core.draw AREA'
+	echo 'volts_sdram_i.label sdram_i'
+	echo 'volts_sdram_i.type GAUGE'
+	echo 'volts_sdram_i.min 0'
+	echo 'volts_sdram_i.draw LINE2'
+	echo 'volts_sdram_c.label sdram_c'
+	echo 'volts_sdram_c.type GAUGE'
+	echo 'volts_sdram_c.min 0'
+	echo 'volts_sdram_c.draw LINE2'
+
+	echo 'volts_sdram_p.label sdram_p'
+	echo 'volts_sdram_p.type GAUGE'
+	echo 'volts_sdram_p.min 0'
+	echo 'volts_sdram_p.draw LINE2'
+
+	echo 'multigraph rpi_temp'
+	echo 'graph_category rpi'
+	echo 'graph_title core temperature'
+        echo 'graph_vlabel C'
+	echo 'rpi_temp.label core temperature'
+	echo 'rpi_temp.type GAUGE'
+	echo 'rpi_temp.min 0'
+	echo 'rpi_temp.draw AREA'
+
+
+
+	echo 'multigraph rpi_freq'
+	echo 'graph_category rpi'
+	echo 'graph_title Frequency'
+        echo 'graph_vlabel Hz'
+
+	echo 'freq_core.label core'
+	echo 'freq_core.type DERIVE'
+	echo 'freq_core.min  0'
+	echo 'freq_core.draw AREA'
+
+	echo 'freq_arm.label arm'
+	echo 'freq_arm.type DERIVE'
+	echo 'freq_arm.min  0'
+	echo 'freq_arm.draw LINE2'
+
+	echo 'freq_isp.label isp'
+	echo 'freq_isp.type DERIVE'
+	echo 'freq_isp.min  0'
+	echo 'freq_isp.draw LINE2'
+
+	echo 'freq_h264.label h264'
+	echo 'freq_h264.type DERIVE'
+	echo 'freq_h264.min  0'
+	echo 'freq_h264.draw LINE2'
+
+	echo 'freq_v3d.label v3d'
+	echo 'freq_v3d.type DERIVE'
+	echo 'freq_v3d.min  0'
+	echo 'freq_v3d.draw LINE2'
+
+	echo 'freq_pwm.label pwm'
+	echo 'freq_pwm.type DERIVE'
+	echo 'freq_pwm.min  0'
+	echo 'freq_pwm.draw LINE2'
+
+	echo 'freq_emmc.label emmc'
+	echo 'freq_emmc.type DERIVE'
+	echo 'freq_emmc.min  0'
+	echo 'freq_emmc.draw LINE2'
+
+	echo 'freq_pixel.label pixel'
+	echo 'freq_pixel.type DERIVE'
+	echo 'freq_pixel.min  0'
+	echo 'freq_pixel.draw LINE2'
+
+	echo 'freq_hdmi.label hdmi'
+	echo 'freq_hdmi.type DERIVE'
+	echo 'freq_hdmi.min  0'
+	echo 'freq_hdmi.draw LINE2'
+elif [ "$1" = "test" ]; then
+	echo $volts_core 
+	echo $volts_sdram_i
+	echo $volts_sdram_c
+	echo $volts_sdram_p
+	echo $temp
+	echo $freq_arm
+	echo $freq_core
+	echo $freq_h264
+	echo $freq_isp
+	echo $freq_v3d
+	echo $freq_uart
+	echo $freq_pwm
+	echo $freq_emmc
+	echo $freq_pixel
+	echo $freq_vec
+	echo $freq_hdmi
+	echo $freq_dpi
+else
+	echo 'multigraph rpi_volts'
+	echo "volts_core.value $volts_core"
+	echo "volts_sdram_i.value $volts_sdram_i"
+	echo "volts_sdram_c.value $volts_sdram_c"
+	echo "volts_sdram_p.value $volts_sdram_p"
+	echo 'multigraph rpi_temp'
+	echo "rpi_temp.value $temp"
+	echo 'multigraph rpi_freq'
+
+	echo "freq_arm.value $freq_arm"
+	echo "freq_core.value $freq_core"
+	echo "freq_h264.value $freq_h264"
+	echo "freq_isp.value $freq_isp"
+	echo "freq_v3d.value $freq_v3d"
+	echo "freq_uart.value $freq_uart"
+	echo "freq_pwm.value $freq_pwm"
+	echo "freq_emmc.value $freq_emmc"
+	echo "freq_pixel.value $freq_pixel"
+#	echo "freq_vec.value $freq_vec"
+	echo "freq_hdmi.value $freq_hdmi"
+#	echo "freq_dpi.value $freq_dpi"
+fi
+	
+	
+	
