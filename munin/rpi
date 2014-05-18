@@ -4,7 +4,7 @@
 
 =head1 NAME
 
-environmental - Plugin to monitor light level
+rpi - Plugin to monitor Raspberry Pis
 
 =head1 APPLICABLE SYSTEMS
 
@@ -14,7 +14,7 @@ All Linux systems
 
 The following is default configuration
 
-  [lightlevel]
+  [rpi]
   user root
 
 
@@ -122,49 +122,65 @@ if [ "$1" = "config" ]; then
         echo 'graph_vlabel Hz'
 
 	echo 'freq_core.label core'
-	echo 'freq_core.type DERIVE'
+	echo 'freq_core.type GAUGE'
 	echo 'freq_core.min  0'
 	echo 'freq_core.draw AREA'
 
 	echo 'freq_arm.label arm'
-	echo 'freq_arm.type DERIVE'
+	echo 'freq_arm.type GAUGE'
 	echo 'freq_arm.min  0'
 	echo 'freq_arm.draw LINE2'
 
 	echo 'freq_isp.label isp'
-	echo 'freq_isp.type DERIVE'
+	echo 'freq_isp.type GAUGE'
 	echo 'freq_isp.min  0'
 	echo 'freq_isp.draw LINE2'
 
 	echo 'freq_h264.label h264'
-	echo 'freq_h264.type DERIVE'
+	echo 'freq_h264.type GAUGE'
 	echo 'freq_h264.min  0'
 	echo 'freq_h264.draw LINE2'
 
 	echo 'freq_v3d.label v3d'
-	echo 'freq_v3d.type DERIVE'
+	echo 'freq_v3d.type GAUGE'
 	echo 'freq_v3d.min  0'
 	echo 'freq_v3d.draw LINE2'
 
 	echo 'freq_pwm.label pwm'
-	echo 'freq_pwm.type DERIVE'
+	echo 'freq_pwm.type GAUGE'
 	echo 'freq_pwm.min  0'
 	echo 'freq_pwm.draw LINE2'
 
+	echo 'freq_uart.label uart'
+	echo "freq_uart.type GAUGE"
+	echo "freq_uart.min 0"
+	echo "freq_uart.draw LINE2"
+
 	echo 'freq_emmc.label emmc'
-	echo 'freq_emmc.type DERIVE'
+	echo 'freq_emmc.type GAUGE'
 	echo 'freq_emmc.min  0'
 	echo 'freq_emmc.draw LINE2'
 
 	echo 'freq_pixel.label pixel'
-	echo 'freq_pixel.type DERIVE'
+	echo 'freq_pixel.type GAUGE'
 	echo 'freq_pixel.min  0'
 	echo 'freq_pixel.draw LINE2'
 
+	echo 'freq_vec.label vec'
+	echo 'freq_vec.type GAUGE'
+	echo 'freq_vec.min  0'
+	echo 'freq_vec.draw LINE2'
+
 	echo 'freq_hdmi.label hdmi'
-	echo 'freq_hdmi.type DERIVE'
+	echo 'freq_hdmi.type GAUGE'
 	echo 'freq_hdmi.min  0'
 	echo 'freq_hdmi.draw LINE2'
+
+	echo 'freq_dpi.label dpi'
+	echo 'freq_dpi.type GAUGE'
+	echo 'freq_dpi.min  0'
+	echo 'freq_dpi.draw LINE2'
+
 elif [ "$1" = "test" ]; then
 	echo $volts_core 
 	echo $volts_sdram_i
@@ -191,20 +207,20 @@ else
 	echo "volts_sdram_p.value $volts_sdram_p"
 	echo 'multigraph rpi_temp'
 	echo "rpi_temp.value $temp"
-	echo 'multigraph rpi_freq'
 
-	echo "freq_arm.value $freq_arm"
+	echo 'multigraph rpi_freq'
 	echo "freq_core.value $freq_core"
-	echo "freq_h264.value $freq_h264"
+	echo "freq_arm.value $freq_arm"
 	echo "freq_isp.value $freq_isp"
+	echo "freq_h264.value $freq_h264"
 	echo "freq_v3d.value $freq_v3d"
-	echo "freq_uart.value $freq_uart"
 	echo "freq_pwm.value $freq_pwm"
+	echo "freq_uart.value $freq_uart"
 	echo "freq_emmc.value $freq_emmc"
 	echo "freq_pixel.value $freq_pixel"
-#	echo "freq_vec.value $freq_vec"
+	echo "freq_vec.value $freq_vec"
 	echo "freq_hdmi.value $freq_hdmi"
-#	echo "freq_dpi.value $freq_dpi"
+	echo "freq_dpi.value $freq_dpi"
 fi
 	
 	
